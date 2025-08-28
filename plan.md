@@ -66,11 +66,11 @@ Note: available_copies will be computed at runtime as total_copies minus active 
 ## Implementation Phases (fast track)
 
 ### Phase 1: Scaffolding & Auth (Day 1)
-1. Initialize Rails app (standard), configure PostgreSQL
-2. Add RSpec, FactoryBot
-3. Install Devise with session-based auth
-4. Seed demo users (librarian, member) and roles
-5. Create Dockerfile for Rails backend (and compose service with PostgreSQL)
+1. Create Dockerfile and docker-compose for Rails web server, PostgreSQL, and required services
+2. Initialize Rails app (run via Docker), configure PostgreSQL
+3. Add RSpec, FactoryBot
+4. Install Devise with session-based auth
+5. Seed demo users (librarian, member) and roles
 
 ### Phase 2: Core Domain & APIs (Day 2)
 1. Models: User, Book, Borrowing; validations and associations
