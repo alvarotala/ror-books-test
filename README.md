@@ -44,3 +44,13 @@ docker compose exec web bash -lc "bundle exec rspec"
 ```
 
 App will be available at http://localhost:3000
+
+Demo credentials:
+Librarian: librarian@example.com / password123
+Member: member@example.com / password123
+
+
+cd /Volumes/dev/ror-books-test
+docker compose up --build -d
+docker compose exec web bash -lc 'bin/rails db:prepare && bin/rails db:seed'
+
