@@ -10,9 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_28_230607) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_28_234227) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "books", force: :cascade do |t|
+    t.string "title", null: false
+    t.string "author", null: false
+    t.string "genre", null: false
+    t.string "isbn", null: false
+    t.integer "total_copies", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author"], name: "index_books_on_author"
+    t.index ["genre"], name: "index_books_on_genre"
+    t.index ["isbn"], name: "index_books_on_isbn", unique: true
+    t.index ["title"], name: "index_books_on_title"
+  end
+
+  create_table "borrowings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "book_id", null: false
+    t.datetime "borrowed_at", null: false
+    t.date "due_date", null: false
+    t.datetime "returned_at"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["book_id"], name: "index_borrowings_on_book_id"
+    t.index ["due_date"], name: "index_borrowings_on_due_date"
+    t.index ["user_id", "book_id", "status"], name: "index_borrowings_on_user_id_and_book_id_and_status"
+    t.index ["user_id"], name: "index_borrowings_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -30,4 +59,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_28_230607) do
     t.index ["role"], name: "index_users_on_role"
   end
 
+  add_foreign_key "borrowings", "books"
+  add_foreign_key "borrowings", "users"
 end
