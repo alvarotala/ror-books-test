@@ -12,6 +12,16 @@ class Borrowing < ApplicationRecord
   before_validation :set_defaults, on: :create
 
   scope :active, -> { where(status: :borrowed, returned_at: nil) }
+  
+  scope :text_search, ->(query) {
+    return all if query.blank?
+    
+    left_joins(:book, :user)
+      .where(
+        "books.title ILIKE :q OR books.author ILIKE :q OR users.email ILIKE :q OR users.first_name ILIKE :q OR users.last_name ILIKE :q",
+        q: "%#{query.strip}%"
+      )
+  }
 
   def return!(comment: nil)
     update!(status: :returned, returned_at: Time.current, return_comment: comment.presence)

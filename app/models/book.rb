@@ -44,4 +44,13 @@ class Book < ApplicationRecord
     pattern = "%#{query.strip}%"
     where("title ILIKE ? OR author ILIKE ? OR genre ILIKE ?", pattern, pattern, pattern)
   end
+
+  # Returns top books by total borrowings count
+  scope :top_by_borrowings, ->(limit = 5) do
+    left_joins(:borrowings)
+      .group('books.id')
+      .order(Arel.sql('COUNT(borrowings.id) DESC'))
+      .limit(limit)
+      .pluck('books.id', 'books.title', 'books.author', 'books.genre', Arel.sql('COUNT(borrowings.id) AS borrowings_count'))
+  end
 end

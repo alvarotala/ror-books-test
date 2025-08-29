@@ -6,8 +6,7 @@ class MembersController < ApplicationController
     scope = User.where(role: :member)
     q = params[:q].to_s.strip
     if q.present?
-      pattern = "%#{q}%"
-      scope = scope.where("email ILIKE ? OR first_name ILIKE ? OR last_name ILIKE ?", pattern, pattern, pattern)
+      scope = scope.search_by_name_or_email(q)
     end
     page = params[:page].to_i
     page = 1 if page <= 0

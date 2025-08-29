@@ -40,12 +40,7 @@ class DashboardsController < ApplicationController
     today = Date.current
 
     # Top books by total borrowings (global, not only current user)
-    top_books_rows = Book
-      .left_joins(:borrowings)
-      .group('books.id')
-      .order(Arel.sql('COUNT(borrowings.id) DESC'))
-      .limit(5)
-      .pluck('books.id', 'books.title', 'books.author', 'books.genre', Arel.sql('COUNT(borrowings.id) AS borrowings_count'))
+    top_books_rows = Book.top_by_borrowings(5)
 
     # Build can_borrow map without relying on symbol pluck for SQL aliases
     can_borrow_map = Book.with_can_borrow_for(current_user)
