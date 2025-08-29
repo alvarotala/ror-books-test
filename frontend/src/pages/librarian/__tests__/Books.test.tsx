@@ -19,13 +19,18 @@ vi.mock('../../../context/AuthContext', () => ({
 import { api } from '../../../api/client'
 
 function setupList(books: any[] = []) {
-  ;(api.get as any).mockResolvedValueOnce({ data: books })
+  ;(api.get as any).mockResolvedValue({ data: books })
   render(<Books />)
 }
 
 describe('Librarian Books page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Set default mock for all API calls to prevent undefined responses
+    ;(api.get as any).mockResolvedValue({ data: [] })
+    ;(api.post as any).mockResolvedValue({ data: {} })
+    ;(api.put as any).mockResolvedValue({ data: {} })
+    ;(api.delete as any).mockResolvedValue({ data: undefined })
   })
 
   it('loads and displays books, allows searching and pagination', async () => {

@@ -18,13 +18,18 @@ vi.mock('../../../context/AuthContext', () => ({
 import { api } from '../../../api/client'
 
 function setupList(members: any[] = []) {
-  ;(api.get as any).mockResolvedValueOnce({ data: members })
+  ;(api.get as any).mockResolvedValue({ data: members })
   render(<Members />)
 }
 
 describe('Librarian Members page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Set default mock for all API calls to prevent undefined responses
+    ;(api.get as any).mockResolvedValue({ data: [] })
+    ;(api.post as any).mockResolvedValue({ data: {} })
+    ;(api.put as any).mockResolvedValue({ data: {} })
+    ;(api.delete as any).mockResolvedValue({ data: undefined })
   })
 
   it('loads and searches members', async () => {
