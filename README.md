@@ -53,14 +53,17 @@ docker compose exec web bash -lc "bin/rails overdue:mark_overdue"
 This task will:
 - Find all borrowed books past their due date
 - Mark them as overdue
-- Log the overdue books
 - Return a count of books marked as overdue
 - Send emails to users (not implemented for this test)
 
-#### Web Interface (Librarian Dashboard)
-Check the dashboard "Mark Overdue Books" button in the Quick Actions section
+#### Manual Web Interface Overdue Check (Librarian Dashboard)
+Check the dashboard "Manually trigger the overdue" button in the Librarian dashboard to manually trigger the overdue service.
 
-** Important **: This option is only for testing, it's not a good practice to do this, we usually use background jobs. But it's just for now ;)
+** Important: ** This option is only for easy testing of this Technical Interview.
+
+#### Periodically Overdue Check (Background Jobs)
+Active Job with Sidekiq, Delayed Job, or Resque
+Not implemented for this test.
 
 
 ### Open Rails console
