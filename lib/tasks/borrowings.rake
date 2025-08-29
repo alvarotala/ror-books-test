@@ -150,6 +150,66 @@ namespace :db do
       end
     end
     
+    # Create borrowings that are almost at due date (within 1-3 days)
+    puts "Creating borrowings almost at due date..."
+    users.sample(rand(3..5)).each do |user|
+      book = books.sample
+      borrowed_at = rand(10..12).days.ago
+      due_date = rand(1..3).days.from_now.to_date
+      
+      Borrowing.create!(
+        user: user,
+        book: book,
+        borrowed_at: borrowed_at,
+        due_date: due_date,
+        status: :borrowed,
+        returned_at: nil,
+        return_comment: nil
+      )
+      
+      borrowings_created += 1
+    end
+    
+    # Create borrowings that are just past due date (1-7 days overdue)
+    puts "Creating borrowings just past due date..."
+    users.sample(rand(2..4)).each do |user|
+      book = books.sample
+      borrowed_at = rand(15..20).days.ago
+      due_date = rand(1..7).days.ago.to_date
+      
+      Borrowing.create!(
+        user: user,
+        book: book,
+        borrowed_at: borrowed_at,
+        due_date: due_date,
+        status: :overdue,
+        returned_at: nil,
+        return_comment: nil
+      )
+      
+      borrowings_created += 1
+    end
+    
+    # Create borrowings that are significantly overdue (1-4 weeks overdue)
+    puts "Creating significantly overdue borrowings..."
+    users.sample(rand(2..3)).each do |user|
+      book = books.sample
+      borrowed_at = rand(25..35).days.ago
+      due_date = rand(7..28).days.ago.to_date
+      
+      Borrowing.create!(
+        user: user,
+        book: book,
+        borrowed_at: borrowed_at,
+        due_date: due_date,
+        status: :overdue,
+        returned_at: nil,
+        return_comment: nil
+      )
+      
+      borrowings_created += 1
+    end
+    
     puts "Successfully created #{borrowings_created} sample borrowings!"
     puts "Status breakdown:"
     puts "  Borrowed: #{Borrowing.borrowed.count}"
