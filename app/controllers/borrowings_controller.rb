@@ -12,6 +12,28 @@ class BorrowingsController < ApplicationController
       scope = scope.where(status: status_param)
     end
 
+    # Text search across member and book
+    q = params[:q].to_s.strip
+    if q.present?
+      scope = scope.left_joins(:book, :user)
+      like = "%#{q}%"
+      scope = scope.where(
+        "books.title ILIKE :q OR books.author ILIKE :q OR users.email ILIKE :q OR users.first_name ILIKE :q OR users.last_name ILIKE :q",
+        q: like
+      )
+    end
+
+    # Specific borrowed date filter (YYYY-MM-DD)
+    date_param = params[:date].presence
+    if date_param.present?
+      begin
+        d = Date.parse(date_param)
+        scope = scope.where(borrowed_at: d.beginning_of_day..d.end_of_day)
+      rescue ArgumentError
+        # ignore invalid date
+      end
+    end
+
     # Sorting: default borrowed_at DESC; if sort=due_date then due_date ASC unless direction provided
     sort_param = params[:sort].presence
     direction_param = params[:direction].to_s.downcase

@@ -21,12 +21,14 @@ export default function BorrowingsPage() {
   const [sort, setSort] = useState<"borrowed_at" | "due_date">("borrowed_at");
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
   const [status, setStatus] = useState<"all" | "borrowed" | "returned" | "overdue">("all");
+  const [q, setQ] = useState("");
+  const [date, setDate] = useState<string>("");
   const { state } = useAuth();
 
   const load = useCallback(async () => {
-    const res = await api.get("/borrowings", { params: { page, sort, status, direction } });
+    const res = await api.get("/borrowings", { params: { page, sort, status, direction, q: q || undefined, date: date || undefined } });
     setItems(res.data);
-  }, [page, sort, status, direction]);
+  }, [page, sort, status, direction, q, date]);
 
   useEffect(() => {
     load();
@@ -41,7 +43,31 @@ export default function BorrowingsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-end gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={q}
+            onChange={(e) => { setQ(e.target.value); setPage(1); }}
+            placeholder="Search member or book..."
+            className="w-64 rounded border border-gray-300 px-2 py-1 text-sm"
+          />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => { setDate(e.target.value); setPage(1); }}
+            className="rounded border border-gray-300 px-2 py-1 text-sm"
+          />
+          {(q || date) && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => { setQ(""); setDate(""); setPage(1); }}
+            >
+              Clear
+            </Button>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <label className="text-sm text-gray-700">Status</label>
           <select
