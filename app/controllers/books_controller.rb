@@ -3,12 +3,17 @@ class BooksController < ApplicationController
   before_action :set_book, only: [:show, :update, :destroy]
 
   def index
-    books = apply_search(Book.all)
-    render json: books
+    respond_to do |format|
+      format.json { render json: apply_search(Book.all) }
+      format.html { render inline: "<h1>Books</h1><p>Use the API or build the frontend.</p>" }
+    end
   end
 
   def show
-    render json: @book
+    respond_to do |format|
+      format.json { render json: @book }
+      format.html { render inline: "<pre>#{ERB::Util.html_escape(@book.attributes.to_json)}</pre>" }
+    end
   end
 
   def create

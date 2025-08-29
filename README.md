@@ -43,6 +43,28 @@ docker compose exec web bash -lc "bin/rails console"
 docker compose exec web bash -lc "bundle exec rspec"
 ```
 
+### Check logs
+Stream the web container logs (includes Rails server output):
+```bash
+docker compose logs -f web
+```
+
+Tail the Rails development log file:
+```bash
+docker compose exec web bash -lc 'tail -f log/development.log'
+```
+
+### Restart the web service
+```bash
+docker compose restart web
+```
+
+
+
+
+
+
+
 App will be available at http://localhost:3000
 
 Demo credentials:

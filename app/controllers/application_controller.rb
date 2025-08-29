@@ -1,7 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  before_action :authenticate_user!
-  before_action :set_default_format
+  before_action :authenticate_user!, unless: :devise_controller?
 
   # Render JSON errors in a consistent structure
   rescue_from ActiveRecord::RecordNotFound do
@@ -13,8 +12,4 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
-  def set_default_format
-    request.format = :json unless params[:format]
-  end
 end
