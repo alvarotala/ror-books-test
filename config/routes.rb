@@ -3,6 +3,12 @@ Rails.application.routes.draw do
 
   devise_for :users
 
+  # Auth/session helper JSON endpoints for frontend
+  post "/session", to: "sessions#create"
+  delete "/session", to: "sessions#destroy"
+  get "/session/current", to: "sessions#current"
+  get "/csrf", to: "sessions#csrf"
+
   resources :books
 
   resources :borrowings, only: [:index, :create] do

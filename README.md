@@ -47,6 +47,7 @@ docker compose exec web bash -lc "bundle exec rspec"
 Stream the web container logs (includes Rails server output):
 ```bash
 docker compose logs -f web
+docker compose logs -f frontend
 ```
 
 Tail the Rails development log file:
@@ -57,8 +58,19 @@ docker compose exec web bash -lc 'tail -f log/development.log'
 ### Restart the web service
 ```bash
 docker compose restart web
+docker compose restart frontend
 ```
 
+### Start all services
+
+Frontend: http://localhost:5173
+API: http://localhost:3000
+
+
+```bash
+cd ror-books-test
+docker compose up -d
+```
 
 
 
