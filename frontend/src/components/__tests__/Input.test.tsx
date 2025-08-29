@@ -12,7 +12,7 @@ describe('Input', () => {
   it('renders error and applies error classes', () => {
     render(<Input label="Email" error="Required" />)
     expect(screen.getByText('Required')).toBeInTheDocument()
-    const input = screen.getByLabelText('Email') as HTMLInputElement
+    const input = screen.getByLabelText(/email/i, { selector: 'input' }) as HTMLInputElement
     expect(input.className).toMatch(/border-red-500/)
   })
 })

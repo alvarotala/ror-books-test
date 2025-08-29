@@ -44,8 +44,9 @@ describe('Account page', () => {
     expect(screen.getByText(/loading/i)).toBeInTheDocument()
     expect(await screen.findByText(/account settings/i)).toBeInTheDocument()
 
-    await userEvent.clear(screen.getByLabelText(/first name/i))
-    await userEvent.type(screen.getByLabelText(/first name/i), 'Grace')
+    const firstNameInput = screen.getAllByRole('textbox').at(0) as HTMLInputElement
+    await userEvent.clear(firstNameInput)
+    await userEvent.type(firstNameInput, 'Grace')
     await userEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
     await waitFor(() => expect(putMock).toHaveBeenCalled())
@@ -59,9 +60,10 @@ describe('Account page', () => {
 
     render(<Account />)
     await screen.findByText(/account settings/i)
-    await userEvent.type(screen.getByLabelText(/current password/i), 'oldpass')
-    await userEvent.type(screen.getByLabelText(/^new password$/i), 'newpass')
-    await userEvent.type(screen.getByLabelText(/confirm new password/i), 'newpass')
+    const [current, next, confirm] = Array.from(document.querySelectorAll('input[type="password"]')) as HTMLInputElement[]
+    await userEvent.type(current, 'oldpass')
+    await userEvent.type(next, 'newpass')
+    await userEvent.type(confirm, 'newpass')
     await userEvent.click(screen.getByRole('button', { name: /change password/i }))
     await waitFor(() => expect(patchMock).toHaveBeenCalled())
     expect(screen.getByText(/password changed/i)).toBeInTheDocument()

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import React from 'react'
 import BorrowingsPage from '../librarian/Borrowings'
 
@@ -28,7 +28,9 @@ describe('Librarian Borrowings', () => {
     ] })
     render(<BorrowingsPage />)
     await waitFor(() => expect(screen.getByText('T1')).toBeInTheDocument())
-    expect(screen.getByText(/borrowed/i)).toBeInTheDocument()
+    const row = screen.getByText('T1').closest('tr') as HTMLTableRowElement
+    expect(row).toBeInTheDocument()
+    expect(within(row).getByText(/borrowed/i)).toBeInTheDocument()
   })
 })
 
