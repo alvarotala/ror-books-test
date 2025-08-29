@@ -5,11 +5,6 @@ No local installs required. Use Docker for Rails web server and PostgreSQL.
 ### Prerequisites
 - Docker Desktop
 
-### First-time setup (if app not generated yet)
-```bash
-docker compose run --rm web bash -lc "rails new . --force --database=postgresql && bundle install"
-```
-
 ### Configure database.yml (only if missing)
 Set adapter and host env via `DATABASE_URL_DEV` or use this minimal config:
 ```yaml
@@ -106,6 +101,7 @@ npm run test:run
 ```
 
 ### Check logs
+
 Stream the web container logs (includes Rails server output):
 ```bash
 docker compose logs -f web
@@ -126,6 +122,7 @@ docker compose restart frontend
 ### Start all services
 
 Frontend: http://localhost:5173
+
 API: http://localhost:3000
 
 
@@ -133,9 +130,13 @@ API: http://localhost:3000
 cd ror-books-test
 docker compose up -d
 ```
+
 Demo credentials: (if seeded)
+
 Librarian: librarian@example.com / password123
+
 Member 1: megan@example.com / password123
+
 Member 2: john@example.com / password123
 
 
