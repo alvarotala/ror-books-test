@@ -36,4 +36,21 @@ class Book < ApplicationRecord
       .select('books.*')
       .select(Arel.sql("CASE WHEN (#{is_member_sql}) AND (COALESCE(active.active_count, 0) < books.total_copies) AND user_active.book_id IS NULL THEN TRUE ELSE FALSE END AS can_borrow"))
   end
+
+  # Search scope for filtering books by title, author, or genre
+  scope :search, ->(query) do
+    return all unless query.present?
+    
+    pattern = "%#{query.strip}%"
+    where("title ILIKE ? OR author ILIKE ? OR genre ILIKE ?", pattern, pattern, pattern)
+  end
+
+  # Returns top books by total borrowings count
+  scope :top_by_borrowings, ->(limit = 5) do
+    left_joins(:borrowings)
+      .group('books.id')
+      .order(Arel.sql('COUNT(borrowings.id) DESC'))
+      .limit(limit)
+      .pluck('books.id', 'books.title', 'books.author', 'books.genre', Arel.sql('COUNT(borrowings.id) AS borrowings_count'))
+  end
 end

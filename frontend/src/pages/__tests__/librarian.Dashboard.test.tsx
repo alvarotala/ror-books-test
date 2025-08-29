@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithRouter, screen, waitFor } from '../../test-utils'
 import React from 'react'
 import LibrarianDashboard from '../librarian/Dashboard'
 
@@ -7,7 +8,7 @@ const getMock = vi.fn()
 vi.mock('../../api/client', () => {
   return {
     api: {
-      get: (...args: any[]) => getMock(...args),
+      get: (...args: unknown[]) => getMock(...args),
     },
   }
 })
@@ -30,7 +31,7 @@ describe('Librarian Dashboard', () => {
       top_genres: { Fiction: 5 },
       recent_borrowings: [],
     } })
-    render(<LibrarianDashboard />)
+    renderWithRouter(<LibrarianDashboard />)
     await waitFor(() => expect(screen.getByText(/total books/i)).toBeInTheDocument())
     expect(screen.getByText('10')).toBeInTheDocument()
   })

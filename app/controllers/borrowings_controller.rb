@@ -15,12 +15,7 @@ class BorrowingsController < ApplicationController
     # Text search across member and book
     q = params[:q].to_s.strip
     if q.present?
-      scope = scope.left_joins(:book, :user)
-      like = "%#{q}%"
-      scope = scope.where(
-        "books.title ILIKE :q OR books.author ILIKE :q OR users.email ILIKE :q OR users.first_name ILIKE :q OR users.last_name ILIKE :q",
-        q: like
-      )
+      scope = scope.text_search(q)
     end
 
     # Specific borrowed date filter (YYYY-MM-DD)

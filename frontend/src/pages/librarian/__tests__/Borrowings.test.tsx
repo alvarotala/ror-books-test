@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithRouter, screen, fireEvent, waitFor } from '../../../test-utils'
 import Borrowings from '../Borrowings'
 
 vi.mock('../../../api/client', () => {
@@ -23,14 +23,14 @@ function sampleItems() {
 }
 
 function setup(items = sampleItems()) {
-  ;(api.get as any).mockResolvedValue({ data: items })
-  render(<Borrowings />)
+  ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: items })
+  renderWithRouter(<Borrowings />)
 }
 
 describe('Librarian Borrowings page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(api.get as any).mockResolvedValue({ data: sampleItems() }) // default fallback
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: sampleItems() }) // default fallback
   })
 
   it('loads, filters, sorts, and clears filters', async () => {
@@ -38,34 +38,34 @@ describe('Librarian Borrowings page', () => {
     await screen.findByText('B1')
 
     // status filter
-    ;(api.get as any).mockResolvedValueOnce({ data: sampleItems() })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: sampleItems() })
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'overdue' } })
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(2))
 
     // search
-    ;(api.get as any).mockResolvedValueOnce({ data: sampleItems() })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: sampleItems() })
     fireEvent.change(screen.getByPlaceholderText('Search member or book...'), { target: { value: 'B1' } })
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(3))
 
     // date filter
-    ;(api.get as any).mockResolvedValueOnce({ data: sampleItems() })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: sampleItems() })
     const dateInput = screen.getByDisplayValue('') as HTMLInputElement
     fireEvent.change(dateInput, { target: { value: '2024-01-05' } })
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(4))
 
     // clear filters
-    ;(api.get as any).mockResolvedValueOnce({ data: sampleItems() })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: sampleItems() })
     fireEvent.click(screen.getByText('Clear'))
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(5))
 
     // sort headers
-    ;(api.get as any).mockResolvedValueOnce({ data: sampleItems() })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: sampleItems() })
     // Click the sort header using role=columnheader and name
     const borrowedHeader = screen.getAllByRole('columnheader', { name: /Borrowed/i })[0]
     fireEvent.click(borrowedHeader)
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(6))
 
-    ;(api.get as any).mockResolvedValueOnce({ data: sampleItems() })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: sampleItems() })
     const dueHeader = screen.getAllByRole('columnheader', { name: /Due/i })[0]
     fireEvent.click(dueHeader)
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(7))
@@ -79,8 +79,8 @@ describe('Librarian Borrowings page', () => {
     const comment = screen.getByLabelText('Optional comment') as HTMLInputElement
     fireEvent.change(comment, { target: { value: 'All good' } })
 
-    ;(api.post as any).mockResolvedValueOnce({})
-    ;(api.get as any).mockResolvedValueOnce({ data: sampleItems() }) // reload
+    ;(api.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({})
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: sampleItems() }) // reload
     fireEvent.click(screen.getByRole('button', { name: 'Confirm Return' }))
 
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/borrowings/1/return_book', { comment: 'All good' }))

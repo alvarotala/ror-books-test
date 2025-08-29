@@ -36,7 +36,35 @@ docker compose exec web bash -lc "bin/rails db:prepare"
 ### Seed data (optional)
 ```bash
 docker compose exec web bash -lc 'bin/rails db:seed'
+
+docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
+
+docker compose exec web bash -lc 'bin/rails db:seed_borrowings'
 ```
+
+### Overdue Book Management
+
+#### Manual Overdue Check (Rake Task)
+To manually trigger the overdue book check from the command line:
+```bash
+docker compose exec web bash -lc "bin/rails overdue:mark_overdue"
+```
+
+This task will:
+- Find all borrowed books past their due date
+- Mark them as overdue
+- Return a count of books marked as overdue
+- Send emails to users (not implemented for this test)
+
+#### Manual Web Interface Overdue Check (Librarian Dashboard)
+Check the dashboard "Manually trigger the overdue" button in the Librarian dashboard to manually trigger the overdue service.
+
+** Important: ** This option is only for easy testing of this Technical Interview.
+
+#### Periodically Overdue Check (Background Jobs)
+Active Job with Sidekiq, Delayed Job, or Resque
+Not implemented for this test.
+
 
 ### Open Rails console
 ```bash
@@ -105,18 +133,10 @@ API: http://localhost:3000
 cd ror-books-test
 docker compose up -d
 ```
-Demo credentials:
+Demo credentials: (if seeded)
 Librarian: librarian@example.com / password123
 Member 1: megan@example.com / password123
 Member 2: john@example.com / password123
-
-
-
-### Seed Bestsellers Books
-
-```bash
-docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
-```
 
 
 ### Continuous Integration (GitHub Actions)

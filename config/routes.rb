@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   namespace :dashboard do
     get :librarian, to: "/dashboards#librarian"
     get :member, to: "/dashboards#member"
+    post :mark_overdue, to: "/dashboards#mark_overdue"
   end
 
   root to: "books#index"

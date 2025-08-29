@@ -3,12 +3,13 @@ import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 import { Card, CardContent, CardHeader } from "../../components/Card";
 import Input from "../../components/Input";
+import { useNavigate } from "react-router-dom";
 
 type LibrarianData = {
   total_books: number;
   currently_borrowed: number;
   due_today: number;
-  members_with_overdue: number;
+  overdue_books_count: number;
   top_genres: Record<string, number>;
   recent_borrowings: Array<{
     id: number;
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const [data, setData] = useState<LibrarianData | null>(null);
   const [q, setQ] = useState("");
   const [quickResults, setQuickResults] = useState<Array<{ id: number; title: string; author: string }>>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -47,6 +49,27 @@ export default function Dashboard() {
     return () => clearTimeout(id);
   }, [q]);
 
+  const handleMarkOverdue = async () => {
+    if (!confirm('Are you sure you want to manually trigger the overdue check? This will mark all borrowed books past their due date as overdue.')) {
+      return;
+    }
+
+    try {
+      const res = await api.post('/dashboard/mark_overdue');
+      if (res.data.success) {
+        alert(res.data.message);
+        // Refresh dashboard data
+        const dashboardRes = await api.get('/dashboard/librarian');
+        setData(dashboardRes.data as LibrarianData);
+      } else {
+        alert('Error: ' + res.data.error);
+      }
+    } catch (error) {
+      alert('Error occurred while marking overdue books');
+      console.error(error);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold tracking-tight">Dashboard</h1>
@@ -54,9 +77,32 @@ export default function Dashboard() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Total books" value={data?.total_books} />
-            <Stat label="Currently borrowed" value={data?.currently_borrowed} />
-            <Stat label="Due today" value={data?.due_today} />
-            <Stat label="Members with overdue" value={data?.members_with_overdue} />
+            {data && data.currently_borrowed > 0 && (
+              <Stat 
+                label="Currently borrowed" 
+                value={data.currently_borrowed} 
+                onClick={() => navigate('/borrowings?status=borrowed')}
+                clickable
+              />
+            )}
+            {data && data.due_today > 0 && (
+              <div 
+                className="border-2 border-yellow-500 rounded-lg p-4 bg-yellow-50 cursor-pointer hover:bg-yellow-100 transition-colors"
+                onClick={() => navigate('/borrowings?status=borrowed')}
+              >
+                <div className="text-yellow-700 text-sm font-semibold">Due soon (3d)</div>
+                <div className="text-yellow-800 text-3xl font-bold">{data.due_today}</div>
+              </div>
+            )}
+            {data && data.overdue_books_count > 0 && (
+              <div 
+                className="border-2 border-red-500 rounded-lg p-4 bg-red-50 cursor-pointer hover:bg-red-100 transition-colors"
+                onClick={() => navigate('/borrowings?status=overdue')}
+              >
+                <div className="text-red-700 text-sm font-semibold">Overdue books</div>
+                <div className="text-red-800 text-3xl font-bold">{data.overdue_books_count}</div>
+              </div>
+            )}
           </div>
 
           <Card>
@@ -111,15 +157,24 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+
+          <div>
+              <p className="text-sm mt-2">
+                <a onClick={handleMarkOverdue} className="text-blue-600 hover:underline cursor-pointer">Manually trigger the overdue</a> check to mark borrowed books past their due date as overdue.
+              </p>
+          </div>
         </div>
       ) : null}
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: number | string | null | undefined }) {
+function Stat({ label, value, onClick, clickable }: { label: string; value: number | string | null | undefined; onClick?: () => void; clickable?: boolean }) {
   return (
-    <div className="border rounded p-3">
+    <div 
+      className={`border rounded p-3 cursor-pointer ${clickable ? 'hover:bg-gray-50' : ''}`}
+      onClick={onClick}
+    >
       <div className="text-gray-500 text-sm">{label}</div>
       <div className="text-2xl font-bold">{value ?? '-'}</div>
     </div>

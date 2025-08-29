@@ -157,12 +157,6 @@ Note: available_copies will be computed at runtime as total_copies minus active 
 - **Query Optimization**: Avoid N+1 with includes
 - **Computed Availability**: Calculate on the fly
 
-## Deployment & DevOps (lightweight)
-
-- **Environments**: Development; optional single production instance (Render/Heroku)
-- **Migrations**: Standard Rails workflow
-- **ENV Vars**: Basic secrets via platform or dotenv
-- **Important**: Keep all important business logic in the backend, make a clean API.
 
 ## Success Criteria
 

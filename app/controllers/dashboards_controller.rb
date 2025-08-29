@@ -6,13 +6,31 @@ class DashboardsController < ApplicationController
     data = {
       total_books: Book.count,
       currently_borrowed: Borrowing.borrowed.count,
-      due_today: Borrowing.where(due_date: today, status: :borrowed).count,
-      members_with_overdue: Borrowing.overdue.select(:user_id).distinct.count,
+      due_today: Borrowing.where(due_date: today..(today + 3.days), status: :borrowed).count,
+      overdue_books_count: Borrowing.overdue.count,
       top_genres: Book.group(:genre).order(Arel.sql('count_all desc')).limit(5).count,
       recent_borrowings: Borrowing.order(created_at: :desc).limit(5).includes(:book, :user).as_json(include: { book: { only: [:id, :title] }, user: { only: [:id, :email, :first_name, :last_name] } })
     }
 
     render json: data
+  end
+
+  def mark_overdue
+    return render json: { error: 'Forbidden' }, status: :forbidden unless current_user.librarian?
+
+    begin
+      result = OverdueService.mark_overdue_books
+      render json: { 
+        success: true, 
+        message: "Successfully marked #{result[:count]} books as overdue",
+        count: result[:count]
+      }
+    rescue => e
+      render json: { 
+        success: false, 
+        error: e.message 
+      }, status: :internal_server_error
+    end
   end
 
   def member
@@ -22,12 +40,7 @@ class DashboardsController < ApplicationController
     today = Date.current
 
     # Top books by total borrowings (global, not only current user)
-    top_books_rows = Book
-      .left_joins(:borrowings)
-      .group('books.id')
-      .order(Arel.sql('COUNT(borrowings.id) DESC'))
-      .limit(5)
-      .pluck('books.id', 'books.title', 'books.author', 'books.genre', Arel.sql('COUNT(borrowings.id) AS borrowings_count'))
+    top_books_rows = Book.top_by_borrowings(5)
 
     # Build can_borrow map without relying on symbol pluck for SQL aliases
     can_borrow_map = Book.with_can_borrow_for(current_user)
@@ -42,7 +55,7 @@ class DashboardsController < ApplicationController
     due_soon_count = current_user.borrowings.where(status: :borrowed).where(due_date: today..(today + 3.days)).count
 
     data = {
-      current_borrowings: current_user.borrowings.borrowed.includes(:book).as_json(include: :book),
+      current_borrowings: current_user.borrowings.where(status: [:borrowed, :overdue]).includes(:book).as_json(include: :book),
       history: current_user.borrowings.order(created_at: :desc).limit(20).includes(:book).as_json(include: :book),
       top_books: top_books,
       alerts: {
