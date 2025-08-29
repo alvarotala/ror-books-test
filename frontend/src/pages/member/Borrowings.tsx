@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { api } from "../../api/client";
 import { Table, THead, TBody, TR, TH, TD } from "../../components/Table";
 import Badge from "../../components/Badge";
@@ -14,11 +15,15 @@ type Borrowing = {
 };
 
 export default function MemberBorrowingsPage() {
+  const [searchParams] = useSearchParams();
   const [items, setItems] = useState<Borrowing[]>([]);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<"borrowed_at" | "due_date">("borrowed_at");
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
-  const [status, setStatus] = useState<"all" | "borrowed" | "returned" | "overdue">("all");
+  const [status, setStatus] = useState<"all" | "borrowed" | "returned" | "overdue">(() => {
+    const statusParam = searchParams.get('status');
+    return (statusParam === 'borrowed' || statusParam === 'returned' || statusParam === 'overdue') ? statusParam : 'all';
+  });
   const [q, setQ] = useState("");
   const [date, setDate] = useState<string>("");
 

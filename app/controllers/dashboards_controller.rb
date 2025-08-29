@@ -42,7 +42,7 @@ class DashboardsController < ApplicationController
     due_soon_count = current_user.borrowings.where(status: :borrowed).where(due_date: today..(today + 3.days)).count
 
     data = {
-      current_borrowings: current_user.borrowings.borrowed.includes(:book).as_json(include: :book),
+      current_borrowings: current_user.borrowings.where(status: [:borrowed, :overdue]).includes(:book).as_json(include: :book),
       history: current_user.borrowings.order(created_at: :desc).limit(20).includes(:book).as_json(include: :book),
       top_books: top_books,
       alerts: {

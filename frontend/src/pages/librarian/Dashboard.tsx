@@ -3,6 +3,7 @@ import { api } from "../../api/client";
 import { useAuth } from "../../context/AuthContext";
 import { Card, CardContent, CardHeader } from "../../components/Card";
 import Input from "../../components/Input";
+import { useNavigate } from "react-router-dom";
 
 type LibrarianData = {
   total_books: number;
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const [data, setData] = useState<LibrarianData | null>(null);
   const [q, setQ] = useState("");
   const [quickResults, setQuickResults] = useState<Array<{ id: number; title: string; author: string }>>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -54,9 +56,24 @@ export default function Dashboard() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Total books" value={data?.total_books} />
-            <Stat label="Currently borrowed" value={data?.currently_borrowed} />
-            <Stat label="Due today" value={data?.due_today} />
-            <Stat label="Members with overdue" value={data?.members_with_overdue} />
+            <Stat 
+              label="Currently borrowed" 
+              value={data?.currently_borrowed} 
+              onClick={() => navigate('/borrowings?status=borrowed')}
+              clickable
+            />
+            <Stat 
+              label="Due today" 
+              value={data?.due_today} 
+              onClick={() => navigate('/borrowings?status=borrowed')}
+              clickable
+            />
+            <Stat 
+              label="Members with overdue" 
+              value={data?.members_with_overdue} 
+              onClick={() => navigate('/borrowings?status=overdue')}
+              clickable
+            />
           </div>
 
           <Card>
@@ -117,9 +134,12 @@ export default function Dashboard() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number | string | null | undefined }) {
+function Stat({ label, value, onClick, clickable }: { label: string; value: number | string | null | undefined; onClick?: () => void; clickable?: boolean }) {
   return (
-    <div className="border rounded p-3">
+    <div 
+      className={`border rounded p-3 cursor-pointer ${clickable ? 'hover:bg-gray-50' : ''}`}
+      onClick={onClick}
+    >
       <div className="text-gray-500 text-sm">{label}</div>
       <div className="text-2xl font-bold">{value ?? '-'}</div>
     </div>

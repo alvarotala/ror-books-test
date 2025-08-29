@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 import { Card, CardContent, CardHeader } from "../../components/Card";
 import Input from "../../components/Input";
 import BorrowButton from "../../components/BorrowButton";
+import Badge from "../../components/Badge";
 
 type BookResult = { id: number; title: string; author: string; can_borrow?: boolean };
 type TopBook = { id: number; title: string; author: string; genre?: string | null; borrowings_count: number; can_borrow?: boolean };
@@ -18,6 +20,7 @@ export default function MemberDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [q, setQ] = useState("");
   const [quickResults, setQuickResults] = useState<BookResult[]>([]);
+  const navigate = useNavigate();
 
   const dueBadge = (dueDateStr: string) => {
     const now = new Date();
@@ -27,25 +30,15 @@ export default function MemberDashboard() {
     const msInDay = 24 * 60 * 60 * 1000;
     const diffDays = Math.ceil((dueDay.getTime() - today.getTime()) / msInDay);
 
-    let className = "border-green-200 bg-green-50 text-green-700";
-    let label = `Due ${due.toLocaleDateString()}`;
-
     if (diffDays < 0) {
-      className = "border-red-200 bg-red-50 text-red-700";
-      label = `Overdue since ${due.toLocaleDateString()}`;
+      return <Badge variant="danger">Overdue since {due.toLocaleDateString()}</Badge>;
     } else if (diffDays === 0) {
-      className = "border-red-200 bg-red-50 text-red-700";
-      label = "Due today";
+      return <Badge variant="danger">Due today</Badge>;
     } else if (diffDays <= 3) {
-      className = "border-amber-200 bg-amber-50 text-amber-700";
-      label = `Due in ${diffDays} day${diffDays === 1 ? '' : 's'}`;
+      return <Badge variant="warning">Due in {diffDays} day{diffDays === 1 ? '' : 's'}</Badge>;
+    } else {
+      return <Badge variant="success">Due {due.toLocaleDateString()}</Badge>;
     }
-
-    return (
-      <span className={`inline-flex items-center rounded border px-2 py-0.5 text-xs ${className}`}>
-        {label}
-      </span>
-    );
   };
 
   useEffect(() => {
@@ -72,7 +65,15 @@ export default function MemberDashboard() {
       <h1 className="text-xl font-semibold tracking-tight">Dashboard</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Overdue" value={data?.alerts?.overdue_count ?? 0} />
+        {data?.alerts?.overdue_count && data.alerts.overdue_count > 0 && (
+          <div 
+            className="border-2 border-red-500 rounded-lg p-4 bg-red-50 cursor-pointer hover:bg-red-100 transition-colors"
+            onClick={() => navigate('/borrowings?status=overdue')}
+          >
+            <div className="text-red-700 text-sm font-semibold">OVERDUE</div>
+            <div className="text-red-800 text-3xl font-bold">{data.alerts.overdue_count}</div>
+          </div>
+        )}
         <Stat label="Due soon (3d)" value={data?.alerts?.due_soon_count ?? 0} />
       </div>
 
@@ -124,23 +125,31 @@ export default function MemberDashboard() {
           </CardHeader>
           <CardContent>
             <ul className="divide-y rounded-md border text-sm">
-              {data?.current_borrowings?.length ? data.current_borrowings.map((r) => (
-                <li key={r.id} className="flex items-center justify-between p-3">
-                  <div>
-                    <div className="font-medium">{r.book?.title}</div>
-                    <div className="text-gray-500 text-xs mt-0.5">
-                      {r.book?.author ? <span>by {r.book.author}</span> : null}
-                      {r.borrowed_at ? (
-                        <span>
-                          {r.book?.author ? ' • ' : ''}
-                          Borrowed {new Date(r.borrowed_at).toLocaleDateString()}
-                        </span>
-                      ) : null}
+              {data?.current_borrowings?.length ? data.current_borrowings.map((r) => {
+                const now = new Date();
+                const due = new Date(r.due_date);
+                const diffDays = Math.ceil((due.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+                const isOverdue = diffDays < 0;
+                const isDueSoon = diffDays >= 0 && diffDays <= 3;
+                
+                return (
+                  <li key={r.id} className={`flex items-center justify-between p-3 ${isOverdue ? 'bg-red-50 border-l-4 border-l-red-500' : isDueSoon ? 'bg-amber-50 border-l-4 border-l-amber-500' : ''}`}>
+                    <div>
+                      <div className="font-medium">{r.book?.title}</div>
+                      <div className="text-gray-500 text-xs mt-0.5">
+                        {r.book?.author ? <span>by {r.book.author}</span> : null}
+                        {r.borrowed_at ? (
+                          <span>
+                            {r.book?.author ? ' • ' : ''}
+                            Borrowed {new Date(r.borrowed_at).toLocaleDateString()}
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
-                  <div>{dueBadge(r.due_date)}</div>
-                </li>
-              )) : (
+                    <div>{dueBadge(r.due_date)}</div>
+                  </li>
+                );
+              }) : (
                 <li className="p-3 text-gray-500">No current borrowings</li>
               )}
             </ul>
