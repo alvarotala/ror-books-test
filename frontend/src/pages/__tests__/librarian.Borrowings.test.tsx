@@ -1,4 +1,5 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithRouter, screen, waitFor, within } from '../../test-utils'
 import React from 'react'
 import BorrowingsPage from '../librarian/Borrowings'
 
@@ -7,7 +8,7 @@ const getMock = vi.fn()
 vi.mock('../../api/client', () => {
   return {
     api: {
-      get: (...args: any[]) => getMock(...args),
+      get: (...args: unknown[]) => getMock(...args),
       post: vi.fn(),
     },
   }
@@ -26,7 +27,7 @@ describe('Librarian Borrowings', () => {
     getMock.mockResolvedValueOnce({ data: [
       { id: 1, book: { id: 1, title: 'T1', author: 'A1' }, borrowed_at: new Date().toISOString(), due_date: new Date().toISOString(), status: 'borrowed', user: { id: 1, email: 'm@e.com' } },
     ] })
-    render(<BorrowingsPage />)
+    renderWithRouter(<BorrowingsPage />)
     await waitFor(() => expect(screen.getByText('T1')).toBeInTheDocument())
     const row = screen.getByText('T1').closest('tr') as HTMLTableRowElement
     expect(row).toBeInTheDocument()

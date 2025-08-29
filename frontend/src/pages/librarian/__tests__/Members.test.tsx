@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
+import { renderWithRouter, screen, fireEvent, waitFor, within } from '../../../test-utils'
 import Members from '../Members'
 
 vi.mock('../../../api/client', () => {
@@ -17,26 +17,26 @@ vi.mock('../../../context/AuthContext', () => ({
 
 import { api } from '../../../api/client'
 
-function setupList(members: any[] = []) {
-  ;(api.get as any).mockResolvedValue({ data: members })
-  render(<Members />)
+function setupList(members: unknown[] = []) {
+  ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: members })
+  renderWithRouter(<Members />)
 }
 
 describe('Librarian Members page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Set default mock for all API calls to prevent undefined responses
-    ;(api.get as any).mockResolvedValue({ data: [] })
-    ;(api.post as any).mockResolvedValue({ data: {} })
-    ;(api.put as any).mockResolvedValue({ data: {} })
-    ;(api.delete as any).mockResolvedValue({ data: undefined })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [] })
+    ;(api.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: {} })
+    ;(api.put as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: {} })
+    ;(api.delete as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: undefined })
   })
 
   it('loads and searches members', async () => {
     setupList([{ id: 1, email: 'a@b.com', first_name: 'A', last_name: 'B' }])
     await screen.findByText('a@b.com')
 
-    ;(api.get as any).mockResolvedValueOnce({ data: [] })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: [] })
     fireEvent.change(screen.getByPlaceholderText('Search members'), { target: { value: 'zzz' } })
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(2))
   })
@@ -57,7 +57,7 @@ describe('Librarian Members page', () => {
     const pwdInput = screen.getAllByDisplayValue('')[3] as HTMLInputElement
     fireEvent.change(pwdInput, { target: { value: 'tmp' } })
 
-    ;(api.post as any).mockResolvedValueOnce({ data: { id: 2, email: 'm@e.com' } })
+    ;(api.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { id: 2, email: 'm@e.com' } })
     fireEvent.click(screen.getByText('Create'))
     // After success, list shouldn't error; close modal (choose the modal Cancel)
     const cancels = screen.getAllByText('Cancel')
@@ -77,12 +77,12 @@ describe('Librarian Members page', () => {
     await screen.findByText('Email is required')
 
     fireEvent.change(emailInput, { target: { value: 'new@e.com' } })
-    ;(api.put as any).mockResolvedValueOnce({ data: { id: 1, email: 'new@e.com' } })
+    ;(api.put as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { id: 1, email: 'new@e.com' } })
     fireEvent.click(screen.getByText('Save'))
     await screen.findByText('new@e.com')
 
     vi.spyOn(window, 'confirm').mockReturnValueOnce(true)
-    ;(api.delete as any).mockResolvedValueOnce({ data: undefined })
+    ;(api.delete as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: undefined })
     fireEvent.click(screen.getByText('Delete'))
     await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/members/1'))
   })

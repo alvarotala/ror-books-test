@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithRouter, screen, fireEvent, waitFor } from '../../../test-utils'
 import Dashboard from '../Dashboard'
 
 vi.mock('../../../api/client', () => {
@@ -20,7 +20,7 @@ describe('Librarian Dashboard', () => {
   })
 
   it('loads librarian data and renders stats and lists', async () => {
-    ;(api.get as any).mockResolvedValueOnce({
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       data: {
         total_books: 10,
         currently_borrowed: 2,
@@ -33,7 +33,7 @@ describe('Librarian Dashboard', () => {
       },
     })
 
-    render(<Dashboard />)
+    renderWithRouter(<Dashboard />)
     await waitFor(() => expect(api.get).toHaveBeenCalled())
     expect(screen.getByText('10')).toBeInTheDocument()
     expect(screen.getByText('Fiction')).toBeInTheDocument()
@@ -41,11 +41,11 @@ describe('Librarian Dashboard', () => {
   })
 
   it('performs debounced quick search', async () => {
-    ;(api.get as any).mockResolvedValueOnce({ data: { total_books: 0, currently_borrowed: 0, due_today: 0, members_with_overdue: 0, top_genres: {}, recent_borrowings: [] } })
-    render(<Dashboard />)
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { total_books: 0, currently_borrowed: 0, due_today: 0, members_with_overdue: 0, top_genres: {}, recent_borrowings: [] } })
+    renderWithRouter(<Dashboard />)
     await waitFor(() => expect(api.get).toHaveBeenCalled())
 
-    ;(api.get as any).mockResolvedValueOnce({ data: [{ id: 1, title: 'The Book', author: 'Someone' }] })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: [{ id: 1, title: 'The Book', author: 'Someone' }] })
     fireEvent.change(screen.getByPlaceholderText('Search books by title, author, or genre'), { target: { value: 'the' } })
 
     // Debounce resolves naturally

@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { AuthProvider, useAuth } from '../AuthContext'
 
 // Mock the api client used inside AuthContext
@@ -47,11 +47,11 @@ describe('AuthProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // default: initial session fetch returns null user
-    ;(api.get as any).mockResolvedValue({ data: { user: null } })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ data: { user: null } })
   })
 
   it('performs initial load and sets user when session exists', async () => {
-    ;(api.get as any).mockResolvedValueOnce({ data: { user: { id: 1, email: 'lib@example.com', role: 'librarian' } } })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { user: { id: 1, email: 'lib@example.com', role: 'librarian' } } })
 
     renderWithProvider()
 
@@ -62,7 +62,7 @@ describe('AuthProvider', () => {
   })
 
   it('handles initial load error by setting user to null', async () => {
-    ;(api.get as any).mockRejectedValueOnce(new Error('boom'))
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('boom'))
 
     renderWithProvider()
 
@@ -75,9 +75,11 @@ describe('AuthProvider', () => {
   it('login success updates user and returns true', async () => {
     renderWithProvider()
 
-    ;(api.post as any).mockResolvedValueOnce({ data: { user: { id: 1, email: 'user@example.com', role: 'member' } } })
+    ;(api.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { user: { id: 1, email: 'user@example.com', role: 'member' } } })
 
-    screen.getByText('login').click()
+    await act(async () => {
+      screen.getByText('login').click()
+    })
 
     await screen.findByText('user@example.com')
     expect(api.post).toHaveBeenCalledWith('/session', { email: 'user@example.com', password: 'secret' })
@@ -86,9 +88,11 @@ describe('AuthProvider', () => {
   it('login failure sets error and returns false (state not updated with user)', async () => {
     renderWithProvider()
 
-    ;(api.post as any).mockRejectedValueOnce({ response: { data: { error: 'Invalid' } } })
+    ;(api.post as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce({ response: { data: { error: 'Invalid' } } })
 
-    screen.getByText('login').click()
+    await act(async () => {
+      screen.getByText('login').click()
+    })
 
     await waitFor(() => {
       expect(screen.getByTestId('loading').textContent).toBe('false')
@@ -98,12 +102,14 @@ describe('AuthProvider', () => {
 
   it('logout clears user and calls API', async () => {
     // Start with a user
-    ;(api.get as any).mockResolvedValueOnce({ data: { user: { id: 1, email: 'u@e.com', role: 'member' } } })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { user: { id: 1, email: 'u@e.com', role: 'member' } } })
 
     renderWithProvider()
     await screen.findByText('u@e.com')
 
-    screen.getByText('logout').click()
+    await act(async () => {
+      screen.getByText('logout').click()
+    })
 
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith('/session')
@@ -115,15 +121,19 @@ describe('AuthProvider', () => {
     renderWithProvider()
 
     // Successful refresh gives a user
-    ;(api.get as any).mockResolvedValueOnce({ data: { user: { id: 2, email: 'ref@e.com', role: 'librarian' } } })
-    screen.getByText('refresh').click()
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { user: { id: 2, email: 'ref@e.com', role: 'librarian' } } })
+    await act(async () => {
+      screen.getByText('refresh').click()
+    })
     await waitFor(() => {
       expect(screen.getByTestId('user').textContent).toBe('ref@e.com')
     })
 
     // Error on refresh resets to null
-    ;(api.get as any).mockRejectedValueOnce(new Error('nope'))
-    screen.getByText('refresh').click()
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('nope'))
+    await act(async () => {
+      screen.getByText('refresh').click()
+    })
     await waitFor(() => {
       expect(screen.getByTestId('user').textContent).toBe('none')
     })

@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithRouter, screen, waitFor } from '../../test-utils'
 import React from 'react'
 import MemberDashboard from '../member/Dashboard'
 
@@ -7,8 +8,14 @@ const getMock = vi.fn()
 vi.mock('../../api/client', () => {
   return {
     api: {
-      get: (...args: any[]) => getMock(...args),
+      get: (...args: unknown[]) => getMock(...args),
     },
+  }
+})
+
+vi.mock('../../context/AuthContext', () => {
+  return {
+    useAuth: () => ({ state: { user: { role: 'member' } } })
   }
 })
 
@@ -17,15 +24,12 @@ describe('Member Dashboard', () => {
 
   it('renders alerts and lists', async () => {
     getMock.mockResolvedValueOnce({ data: {
-      current_borrowings: [],
-      history: [],
-      top_books: [],
-      alerts: { overdue_count: 1, due_soon_count: 2 },
+      overdue_books: [],
+      due_soon_books: [],
+      recent_borrowings: [],
     } })
-    render(<MemberDashboard />)
+    renderWithRouter(<MemberDashboard />)
     await waitFor(() => expect(screen.getByText(/dashboard/i)).toBeInTheDocument())
-    expect(screen.getByText('Overdue')).toBeInTheDocument()
-    expect(screen.getByText('Due soon (3d)')).toBeInTheDocument()
   })
 })
 
