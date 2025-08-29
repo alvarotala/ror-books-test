@@ -1,0 +1,66 @@
+name: Backend Tests
+
+on:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches: ["main", "master"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ror_books_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ror_books_test" 
+          --health-interval 5s 
+          --health-timeout 5s 
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Setup Node (for Rails asset pipeline if needed)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Prepare database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ror_books_test
+        run: |
+          gem install bundler:2.5.22
+          bundle install --jobs 4 --retry 3
+          bin/rails db:prepare
+
+      - name: Run RSpec with coverage
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ror_books_test
+        run: |
+          bundle exec rspec --format documentation
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: coverage
+
+

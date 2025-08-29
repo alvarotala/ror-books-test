@@ -15,13 +15,14 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  url: <%= ENV["DATABASE_URL"] %>
+
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
   <<: *default
+  url: <%= ENV["DATABASE_URL_DEV"] %>
   database: ror_books_dev
 
   # The specified database role being used to connect to PostgreSQL.
@@ -56,6 +57,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
+  url: <%= ENV["DATABASE_URL_TEST"] %>
   database: ror_books_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
@@ -80,4 +82,5 @@ test:
 #
 production:
   <<: *default
+  url: <%= ENV["DATABASE_URL_PROD"] %>
   database: ror_books_prod

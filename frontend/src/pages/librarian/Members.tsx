@@ -28,8 +28,18 @@ export default function MembersPage() {
   }
 
   const load = async () => {
-    const res = await api.get('/members', { params: { q, page } });
-    setMembers(res.data);
+    try {
+      const res = await api.get('/members', { params: { q, page } });
+      if (res?.data) {
+        setMembers(res.data);
+      } else {
+        console.error('Invalid API response format');
+        setMembers([]);
+      }
+    } catch (error) {
+      console.error('Failed to load members:', error);
+      setMembers([]);
+    }
   };
 
   useEffect(() => { load(); }, [q, page]);
@@ -43,10 +53,15 @@ export default function MembersPage() {
     if (Object.keys(errs).length > 0) return;
     try {
       const res = await api.post('/members', { member: form });
-      setMembers((prev) => [res.data, ...prev]);
-      setCreating(false);
-      setForm({ email: "", first_name: "", last_name: "", password: "" });
-      setCreateErrors({});
+      if (res?.data) {
+        setMembers((prev) => [res.data, ...prev]);
+        setCreating(false);
+        setForm({ email: "", first_name: "", last_name: "", password: "" });
+        setCreateErrors({});
+      } else {
+        console.error('Invalid API response format');
+        alert('Failed to create member: Invalid response');
+      }
     } catch (e: any) {
       const serverErrors = e?.response?.data?.errors;
       if (serverErrors) {
@@ -64,14 +79,29 @@ export default function MembersPage() {
   };
 
   const onUpdate = async (id: number, attrs: Partial<Member>) => {
-    const res = await api.put(`/members/${id}`, { member: attrs });
-    setMembers((prev) => prev.map((m) => (m.id === id ? res.data : m)));
+    try {
+      const res = await api.put(`/members/${id}`, { member: attrs });
+      if (res?.data) {
+        setMembers((prev) => prev.map((m) => (m.id === id ? res.data : m)));
+      } else {
+        console.error('Invalid API response format');
+        alert('Failed to update member: Invalid response');
+      }
+    } catch (error) {
+      console.error('Failed to update member:', error);
+      alert('Failed to update member');
+    }
   };
 
   const onDelete = async (id: number) => {
     if (!confirm('Delete this member?')) return;
-    await api.delete(`/members/${id}`);
-    setMembers((prev) => prev.filter((m) => m.id !== id));
+    try {
+      await api.delete(`/members/${id}`);
+      setMembers((prev) => prev.filter((m) => m.id !== id));
+    } catch (error) {
+      console.error('Failed to delete member:', error);
+      alert('Failed to delete member');
+    }
   };
 
   return (

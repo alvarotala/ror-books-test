@@ -8,9 +8,17 @@ User.find_or_create_by!(email: "librarian@example.com") do |u|
   u.password_confirmation = "password123"
 end
 
-User.find_or_create_by!(email: "member@example.com") do |u|
+User.find_or_create_by!(email: "megan@example.com") do |u|
   u.first_name = "Megan"
   u.last_name  = "Member"
+  u.role       = :member
+  u.password   = "password123"
+  u.password_confirmation = "password123"
+end
+
+User.find_or_create_by!(email: "john@example.com") do |u|
+  u.first_name = "John"
+  u.last_name  = "Doe"
   u.role       = :member
   u.password   = "password123"
   u.password_confirmation = "password123"

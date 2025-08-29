@@ -26,8 +26,18 @@ export default function Books() {
 
   useEffect(() => {
     (async () => {
-      const res = await api.get("/books", { params: { q, page } });
-      setBooks(res.data);
+      try {
+        const res = await api.get("/books", { params: { q, page } });
+        if (res?.data) {
+          setBooks(res.data);
+        } else {
+          console.error('Invalid API response format');
+          setBooks([]);
+        }
+      } catch (error) {
+        console.error('Failed to load books:', error);
+        setBooks([]);
+      }
     })();
   }, [q, page]);
 
@@ -69,10 +79,15 @@ export default function Books() {
 
                 try {
                   const res = await api.post('/books', { book: newBook });
-                  setBooks((prev) => [res.data, ...prev]);
-                  setCreating(false);
-                  setNewBook({ title: "", author: "", genre: "", isbn: "", total_copies: 1 });
-                  setCreateErrors({});
+                  if (res?.data) {
+                    setBooks((prev) => [res.data, ...prev]);
+                    setCreating(false);
+                    setNewBook({ title: "", author: "", genre: "", isbn: "", total_copies: 1 });
+                    setCreateErrors({});
+                  } else {
+                    console.error('Invalid API response format');
+                    alert('Failed to create book: Invalid response');
+                  }
                 } catch (e: any) {
                   const serverErrors = e?.response?.data?.errors;
                   if (serverErrors) {
@@ -172,9 +187,14 @@ function EditBookInline({ book, onChange, onDelete }: { book: Book; onChange: (b
     setLoading(true);
     try {
       const res = await api.put(`/books/${book.id}`, { book: form });
-      onChange(res.data);
-      setEditing(false);
-      setErrors({});
+      if (res?.data) {
+        onChange(res.data);
+        setEditing(false);
+        setErrors({});
+      } else {
+        console.error('Invalid API response format');
+        alert('Failed to save book: Invalid response');
+      }
     } catch (e: any) {
       const serverErrors = e?.response?.data?.errors;
       if (serverErrors) {
