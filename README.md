@@ -50,7 +50,7 @@ docker compose exec web bash -lc "unset DATABASE_URL; RAILS_ENV=test bin/rails d
 
 ### Run tests (RSpec)
 ```bash
-docker compose exec web bash -lc "RAILS_ENV=test bundle exec rspec"
+docker compose exec web bash -lc "bundle exec rspec"
 ```
 
 ### Frontend tests (Vitest)
