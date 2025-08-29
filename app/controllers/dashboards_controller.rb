@@ -6,7 +6,7 @@ class DashboardsController < ApplicationController
     data = {
       total_books: Book.count,
       currently_borrowed: Borrowing.borrowed.count,
-      due_today: Borrowing.where(due_date: today, status: :borrowed).count,
+      due_today: Borrowing.where(due_date: today..(today + 1.days), status: :borrowed).count,
       overdue_books_count: Borrowing.overdue.count,
       top_genres: Book.group(:genre).order(Arel.sql('count_all desc')).limit(5).count,
       recent_borrowings: Borrowing.order(created_at: :desc).limit(5).includes(:book, :user).as_json(include: { book: { only: [:id, :title] }, user: { only: [:id, :email, :first_name, :last_name] } })
