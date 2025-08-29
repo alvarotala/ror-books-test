@@ -59,12 +59,12 @@ class BorrowingsController < ApplicationController
   end
 
   def return_book
-    if current_user.librarian? || @borrowing.user_id == current_user.id
-      @borrowing.return!(comment: params[:comment])
-      render json: @borrowing
-    else
-      render json: { error: 'Forbidden' }, status: :forbidden
+    unless current_user.librarian?
+      render json: { error: 'Forbidden' }, status: :forbidden and return
     end
+
+    @borrowing.return!(comment: params[:comment])
+    render json: @borrowing
   end
 
   private
