@@ -65,7 +65,10 @@ export default function MemberDashboard() {
       <h1 className="text-xl font-semibold tracking-tight">Dashboard</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {data?.alerts?.overdue_count && data.alerts.overdue_count > 0 && (
+        {data && data.current_borrowings.length > 0 && (
+          <Stat label="Total borrowed" value={data.current_borrowings.length} />
+        )}
+        {data && data.alerts.overdue_count > 0 && (
           <div 
             className="border-2 border-red-500 rounded-lg p-4 bg-red-50 cursor-pointer hover:bg-red-100 transition-colors"
             onClick={() => navigate('/borrowings?status=overdue')}
@@ -74,7 +77,12 @@ export default function MemberDashboard() {
             <div className="text-red-800 text-3xl font-bold">{data.alerts.overdue_count}</div>
           </div>
         )}
-        <Stat label="Due soon (3d)" value={data?.alerts?.due_soon_count ?? 0} />
+        {data && data.alerts.due_soon_count > 0 && (
+          <div className="border-2 border-yellow-500 rounded-lg p-4 bg-yellow-50">
+            <div className="text-yellow-700 text-sm font-semibold">Due soon (3d)</div>
+            <div className="text-yellow-800 text-2xl font-bold">{data.alerts.due_soon_count}</div>
+          </div>
+        )}
       </div>
 
       <Card>
