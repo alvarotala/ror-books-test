@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { api } from "../api/client";
-import { useAuth } from "../context/AuthContext";
-import { Table, THead, TBody, TR, TH, TD } from "../components/Table";
-import Badge from "../components/Badge";
-import Button from "../components/Button";
-import Modal from "../components/Modal";
-import Input from "../components/Input";
+import { api } from "../../api/client";
+import { useAuth } from "../../context/AuthContext";
+import { Table, THead, TBody, TR, TH, TD } from "../../components/Table";
+import Badge from "../../components/Badge";
+import Button from "../../components/Button";
+import Modal from "../../components/Modal";
+import Input from "../../components/Input";
 
 type Borrowing = {
   id: number;
