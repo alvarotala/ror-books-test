@@ -53,6 +53,30 @@ docker compose exec web bash -lc "unset DATABASE_URL; RAILS_ENV=test bin/rails d
 docker compose exec web bash -lc "RAILS_ENV=test bundle exec rspec"
 ```
 
+### Frontend tests (Vitest)
+
+Run in Docker (recommended):
+```bash
+docker compose exec frontend sh -lc "npm ci || npm i; npm run test:run"
+```
+
+Watch mode in Docker:
+```bash
+docker compose exec frontend sh -lc "npm run test"
+```
+
+Coverage in Docker:
+```bash
+docker compose exec frontend sh -lc "npm run coverage"
+```
+
+Run locally (outside Docker):
+```bash
+cd frontend
+npm ci
+npm run test:run
+```
+
 ### Check logs
 Stream the web container logs (includes Rails server output):
 ```bash
@@ -83,7 +107,8 @@ docker compose up -d
 ```
 Demo credentials:
 Librarian: librarian@example.com / password123
-Member: member@example.com / password123
+Member 1: megan@example.com / password123
+Member 2: john@example.com / password123
 
 
 
