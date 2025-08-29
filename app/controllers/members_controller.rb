@@ -9,7 +9,11 @@ class MembersController < ApplicationController
       pattern = "%#{q}%"
       scope = scope.where("email ILIKE ? OR first_name ILIKE ? OR last_name ILIKE ?", pattern, pattern, pattern)
     end
-    render json: scope.order(created_at: :desc).select(:id, :email, :first_name, :last_name, :role, :created_at, :updated_at)
+    page = params[:page].to_i
+    page = 1 if page <= 0
+    per_page = 25
+    members = scope.order(created_at: :desc).limit(per_page).offset((page - 1) * per_page)
+    render json: members.select(:id, :email, :first_name, :last_name, :role, :created_at, :updated_at)
   end
 
   def show
@@ -19,16 +23,22 @@ class MembersController < ApplicationController
   def create
     user = User.new(member_params)
     user.role = :member
-    user.save!
-    render json: user.as_json(only: [:id, :email, :first_name, :last_name, :role, :created_at, :updated_at]), status: :created
+    if user.save
+      render json: user.as_json(only: [:id, :email, :first_name, :last_name, :role, :created_at, :updated_at]), status: :created
+    else
+      render json: { errors: user.errors }, status: :unprocessable_entity
+    end
   end
 
   def update
     # Prevent changing role away from member through this controller
     attrs = member_params.to_h.symbolize_keys
     attrs.delete(:role)
-    @member.update!(attrs)
-    render json: @member.as_json(only: [:id, :email, :first_name, :last_name, :role, :created_at, :updated_at])
+    if @member.update(attrs)
+      render json: @member.as_json(only: [:id, :email, :first_name, :last_name, :role, :created_at, :updated_at])
+    else
+      render json: { errors: @member.errors }, status: :unprocessable_entity
+    end
   end
 
   def destroy

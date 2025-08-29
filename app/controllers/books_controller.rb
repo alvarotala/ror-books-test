@@ -24,13 +24,20 @@ class BooksController < ApplicationController
   end
 
   def create
-    book = Book.create!(book_params)
-    render json: book, status: :created
+    book = Book.new(book_params)
+    if book.save
+      render json: book, status: :created
+    else
+      render json: { errors: book.errors }, status: :unprocessable_entity
+    end
   end
 
   def update
-    @book.update!(book_params)
-    render json: @book
+    if @book.update(book_params)
+      render json: @book
+    else
+      render json: { errors: @book.errors }, status: :unprocessable_entity
+    end
   end
 
   def destroy
