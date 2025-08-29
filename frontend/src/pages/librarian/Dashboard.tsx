@@ -73,12 +73,13 @@ export default function Dashboard() {
               />
             )}
             {data && data.members_with_overdue > 0 && (
-              <Stat 
-                label="Members with overdue" 
-                value={data.members_with_overdue} 
+              <div 
+                className="border-2 border-red-500 rounded-lg p-4 bg-red-50 cursor-pointer hover:bg-red-100 transition-colors"
                 onClick={() => navigate('/borrowings?status=overdue')}
-                clickable
-              />
+              >
+                <div className="text-red-700 text-sm font-semibold">Members with overdue</div>
+                <div className="text-red-800 text-3xl font-bold">{data.members_with_overdue}</div>
+              </div>
             )}
           </div>
 
