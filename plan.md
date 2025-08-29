@@ -90,10 +90,10 @@ Note: available_copies will be computed at runtime as total_copies minus active 
 4. Members CRUD
 
 ### Phase 5: Member Business Logic
-1. Dashboard page
-2. In the dasboard list with top books and search
-3. Borrowings (borrow/return) logic
-4. Alerts
+1. Dashboard page with:
+  - list with top books and search
+  - Borrowings logic
+  - Alerts of due
 
 ### Phase 6: Tests, Polish, Docs
 1. RSpec: models and request specs for main flows
