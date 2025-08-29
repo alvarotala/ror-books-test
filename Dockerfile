@@ -28,5 +28,3 @@ EXPOSE 3000
 
 # Default command suitable for dev; ok if app isn't generated yet
 CMD ["bash", "-lc", "bundle check || bundle install && (bin/rails db:prepare || true) && bin/rails server -b 0.0.0.0 -p 3000"]
-
-

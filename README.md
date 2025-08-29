@@ -33,6 +33,11 @@ docker compose up --build
 docker compose exec web bash -lc "bin/rails db:prepare"
 ```
 
+### Seed data (optional)
+```bash
+docker compose exec web bash -lc 'bin/rails db:prepare && bin/rails db:seed'
+```
+
 ### Open Rails console
 ```bash
 docker compose exec web bash -lc "bin/rails console"
@@ -43,4 +48,44 @@ docker compose exec web bash -lc "bin/rails console"
 docker compose exec web bash -lc "bundle exec rspec"
 ```
 
-App will be available at http://localhost:3000
+### Check logs
+Stream the web container logs (includes Rails server output):
+```bash
+docker compose logs -f web
+docker compose logs -f frontend
+```
+
+Tail the Rails development log file:
+```bash
+docker compose exec web bash -lc 'tail -f log/development.log'
+```
+
+### Restart the web service
+```bash
+docker compose restart web
+docker compose restart frontend
+```
+
+### Start all services
+
+Frontend: http://localhost:5173
+API: http://localhost:3000
+
+
+```bash
+cd ror-books-test
+docker compose up -d
+```
+Demo credentials:
+Librarian: librarian@example.com / password123
+Member: member@example.com / password123
+
+
+
+### Seed Bestsellers Books
+
+```bash
+docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
+```
+
+

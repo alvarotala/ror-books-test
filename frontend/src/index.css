@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@layer base {
+  :root { color-scheme: light; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: theme(colors.gray.50);
+    color: theme(colors.gray.900);
+  }
+
+  a {
+    color: theme(colors.gray.700);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: theme(colors.gray.900);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+.container-pg {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 80rem; /* ~max-w-7xl */
+  padding-left: 1rem; /* px-4 */
+  padding-right: 1rem;
+}
