@@ -119,3 +119,27 @@ docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
 ```
 
 
+### Continuous Integration (GitHub Actions)
+
+Two workflows are included in `.github/workflows`:
+- `frontend-tests.yml`: runs `npm ci` and `npm run coverage` in `frontend/`, uploads coverage artifact.
+- `backend-tests.yml`: provisions Postgres 16, prepares test DB, runs `bundle exec rspec`, uploads coverage artifact.
+
+Triggers:
+- On pull requests to any branch.
+- On push to `main` or `master`.
+
+How to trigger:
+```bash
+git checkout -b ci-smoke-test
+git commit --allow-empty -m "CI: smoke test"
+git push -u origin ci-smoke-test
+# open a PR on GitHub
+```
+
+Viewing results:
+- Go to the “Actions” tab in your repository.
+- Open the latest run for “Frontend Tests” or “Backend Tests”.
+- Download `frontend-coverage` or `backend-coverage` artifact to inspect coverage locally (open `index.html`).
+
+
