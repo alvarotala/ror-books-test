@@ -30,8 +30,18 @@ export default function BorrowingsPage() {
   const [returnComment, setReturnComment] = useState<string>("");
 
   const load = useCallback(async () => {
-    const res = await api.get("/borrowings", { params: { page, sort, status, direction, q: q || undefined, date: date || undefined } });
-    setItems(res.data);
+    try {
+      const res = await api.get("/borrowings", { params: { page, sort, status, direction, q: q || undefined, date: date || undefined } });
+      if (res?.data) {
+        setItems(res.data);
+      } else {
+        console.error('Invalid API response format');
+        setItems([]);
+      }
+    } catch (error) {
+      console.error('Failed to load borrowings:', error);
+      setItems([]);
+    }
   }, [page, sort, status, direction, q, date]);
 
   useEffect(() => {
@@ -41,8 +51,13 @@ export default function BorrowingsPage() {
   // No client-side clamp needed; backend paginates per page
 
   const onReturn = async (id: number, comment?: string) => {
-    await api.post(`/borrowings/${id}/return_book`, { comment: comment || undefined });
-    await load();
+    try {
+      await api.post(`/borrowings/${id}/return_book`, { comment: comment || undefined });
+      await load();
+    } catch (error) {
+      console.error('Failed to return book:', error);
+      alert('Failed to return book');
+    }
   };
 
   return (

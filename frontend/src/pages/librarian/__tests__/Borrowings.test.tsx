@@ -23,7 +23,7 @@ function sampleItems() {
 }
 
 function setup(items = sampleItems()) {
-  ;(api.get as any).mockResolvedValueOnce({ data: items })
+  ;(api.get as any).mockResolvedValue({ data: items })
   render(<Borrowings />)
 }
 
