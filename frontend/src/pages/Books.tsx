@@ -164,20 +164,7 @@ function BorrowButton({ bookId }: { bookId: number }) {
   );
 }
 
-function CreateBookForm({ value, onChange, onSubmit }: { value: Partial<Book>; onChange: (v: Partial<Book>) => void; onSubmit: () => Promise<void>; }) {
-  return (
-    <form className="grid grid-cols-5 items-end gap-2" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
-      <Input placeholder="Title" value={value.title || ''} onChange={(e) => onChange({ ...value, title: e.target.value })} />
-      <Input placeholder="Author" value={value.author || ''} onChange={(e) => onChange({ ...value, author: e.target.value })} />
-      <Input placeholder="Genre" value={value.genre || ''} onChange={(e) => onChange({ ...value, genre: e.target.value })} />
-      <Input placeholder="ISBN" value={value.isbn || ''} onChange={(e) => onChange({ ...value, isbn: e.target.value })} />
-      <div className="flex items-center gap-2">
-        <Input className="w-24" placeholder="Copies" type="number" value={value.total_copies || 1} onChange={(e) => onChange({ ...value, total_copies: Number(e.target.value) })} />
-        <Button type="submit">Create</Button>
-      </div>
-    </form>
-  );
-}
+// (Removed unused CreateBookForm component)
 
 function EditBookInline({ book, onChange, onDelete }: { book: Book; onChange: (b: Book) => void; onDelete: () => void; }) {
   const [editing, setEditing] = useState(false);

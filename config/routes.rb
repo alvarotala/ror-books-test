@@ -10,6 +10,11 @@ Rails.application.routes.draw do
   get "/session/current", to: "sessions#current"
   get "/csrf", to: "sessions#csrf"
 
+  # Account management for current user
+  resource :account, only: [:show, :update], controller: :accounts do
+    patch :password, on: :collection
+  end
+
   resources :books
 
   resources :borrowings, only: [:index, :create] do

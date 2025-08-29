@@ -1,9 +1,8 @@
 import { Link, Outlet, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import Button from "./components/Button";
 
 export default function App() {
-  const { state, logout } = useAuth();
+  const { state } = useAuth();
   const location = useLocation();
 
   if (state.loading) {
@@ -48,7 +47,11 @@ export default function App() {
               {state.user?.role === 'librarian' && <NavLink to="/members">Members</NavLink>}
             </nav>
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" onClick={logout} title={state.user.email}>Logout</Button>
+              <Link
+                to="/account"
+                className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
+                title={state.user.email}
+              >Account</Link>
             </div>
           </div>
         </header>

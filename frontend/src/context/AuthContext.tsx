@@ -24,6 +24,7 @@ const AuthContext = createContext<{
   state: State;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  refresh: () => Promise<void>;
 } | null>(null);
 
 function reducer(state: State, action: Action): State {
@@ -77,8 +78,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const refresh = async () => {
+    dispatch({ type: "loading" });
+    try {
+      const res = await api.get("/session/current");
+      dispatch({ type: "loaded", user: res.data?.user ?? null });
+    } catch {
+      dispatch({ type: "loaded", user: null });
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ state, login, logout }}>
+    <AuthContext.Provider value={{ state, login, logout, refresh }}>
       {children}
     </AuthContext.Provider>
   );
