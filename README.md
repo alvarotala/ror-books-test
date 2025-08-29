@@ -33,6 +33,11 @@ docker compose up --build
 docker compose exec web bash -lc "bin/rails db:prepare"
 ```
 
+### Seed data (optional)
+```bash
+docker compose exec web bash -lc 'bin/rails db:prepare && bin/rails db:seed'
+```
+
 ### Open Rails console
 ```bash
 docker compose exec web bash -lc "bin/rails console"
@@ -71,20 +76,9 @@ API: http://localhost:3000
 cd ror-books-test
 docker compose up -d
 ```
-
-
-
-
-
-
-App will be available at http://localhost:3000
-
 Demo credentials:
 Librarian: librarian@example.com / password123
 Member: member@example.com / password123
 
 
-cd /Volumes/dev/ror-books-test
-docker compose up --build -d
-docker compose exec web bash -lc 'bin/rails db:prepare && bin/rails db:seed'
 
