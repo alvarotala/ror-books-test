@@ -29,8 +29,13 @@ class DashboardsController < ApplicationController
       .limit(5)
       .pluck('books.id', 'books.title', 'books.author', 'books.genre', Arel.sql('COUNT(borrowings.id) AS borrowings_count'))
 
+    # Build can_borrow map without relying on symbol pluck for SQL aliases
+    can_borrow_map = Book.with_can_borrow_for(current_user)
+      .where(id: top_books_rows.map(&:first))
+      .map { |b| [b.id, !!b[:can_borrow]] }
+      .to_h
     top_books = top_books_rows.map do |id, title, author, genre, count|
-      { id: id, title: title, author: author, genre: genre, borrowings_count: count.to_i }
+      { id: id, title: title, author: author, genre: genre, borrowings_count: count.to_i, can_borrow: !!can_borrow_map[id] }
     end
 
     overdue_count = current_user.borrowings.overdue.count

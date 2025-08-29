@@ -12,6 +12,7 @@ type Book = {
   genre: string;
   isbn: string;
   total_copies: number;
+  can_borrow?: boolean;
 };
 
 export default function MemberBooks() {
@@ -51,7 +52,7 @@ export default function MemberBooks() {
               <TD className="w-[20%]">{b.genre}</TD>
               <TD className="w-[10%]">{b.isbn}</TD>
               <TD className="w-[10%] text-right">
-                <BorrowButton bookId={b.id} />
+                {b.can_borrow ? <BorrowButton bookId={b.id} /> : <span className="text-xs text-gray-400">N/A</span>}
               </TD>
             </TR>
           ))}
