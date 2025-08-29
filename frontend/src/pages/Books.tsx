@@ -17,22 +17,23 @@ type Book = {
 export default function Books() {
   const [books, setBooks] = useState<Book[]>([]);
   const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
   const [creating, setCreating] = useState(false);
   const [newBook, setNewBook] = useState<Partial<Book>>({ title: "", author: "", genre: "", isbn: "", total_copies: 1 });
   const { state } = useAuth();
 
   useEffect(() => {
     (async () => {
-      const res = await api.get("/books", { params: { q } });
+      const res = await api.get("/books", { params: { q, page } });
       setBooks(res.data);
     })();
-  }, [q]);
+  }, [q, page]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <div className="flex-1">
-          <Input placeholder="Search books" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input placeholder="Search books" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} />
         </div>
         {state.user?.role === 'librarian' && (
           <Button variant={creating ? "ghost" : "primary"} onClick={() => setCreating((v) => !v)}>
@@ -86,6 +87,11 @@ export default function Books() {
           ))}
         </TBody>
       </Table>
+      <div className="flex items-center justify-end gap-2">
+        <span className="text-sm text-gray-600">Page {page}</span>
+        <Button variant="secondary" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>Prev</Button>
+        <Button variant="secondary" size="sm" onClick={() => setPage((p) => p + 1)} disabled={books.length < 25}>Next</Button>
+      </div>
     </div>
   );
 }

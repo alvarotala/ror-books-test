@@ -4,7 +4,14 @@ class BooksController < ApplicationController
 
   def index
     respond_to do |format|
-      format.json { render json: apply_search(Book.all) }
+      format.json do
+        scope = apply_search(Book.all)
+        page = params[:page].to_i
+        page = 1 if page <= 0
+        per_page = 25
+        books = scope.limit(per_page).offset((page - 1) * per_page)
+        render json: books
+      end
       format.html { render inline: "<h1>Books</h1><p>Use the API or build the frontend.</p>" }
     end
   end
