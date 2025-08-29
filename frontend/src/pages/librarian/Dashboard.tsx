@@ -65,12 +65,13 @@ export default function Dashboard() {
               />
             )}
             {data && data.due_today > 0 && (
-              <Stat 
-                label="Due today" 
-                value={data.due_today} 
+              <div 
+                className="border-2 border-yellow-500 rounded-lg p-4 bg-yellow-50 cursor-pointer hover:bg-yellow-100 transition-colors"
                 onClick={() => navigate('/borrowings?status=borrowed')}
-                clickable
-              />
+              >
+                <div className="text-yellow-700 text-sm font-semibold">Due soon (3d)</div>
+                <div className="text-yellow-800 text-3xl font-bold">{data.due_today}</div>
+              </div>
             )}
             {data && data.overdue_books_count > 0 && (
               <div 
