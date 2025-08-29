@@ -65,26 +65,37 @@ Note: available_copies will be computed at runtime as total_copies minus active 
 
 ## Implementation Phases (fast track)
 
-### Phase 1: Scaffolding & Auth (Day 1)
+### Phase 1: Scaffolding & Auth
 1. Create Dockerfile and docker-compose for Rails web server, PostgreSQL, and required services
 2. Initialize Rails app (run via Docker), configure PostgreSQL
 3. Add RSpec, FactoryBot
 4. Install Devise with session-based auth
 5. Seed demo users (librarian, member) and roles
 
-### Phase 2: Core Domain & APIs (Day 2)
+### Phase 2: Core Domain & APIs
 1. Models: User, Book, Borrowing; validations and associations
 2. Controllers: Books (CRUD, librarian-only), Borrowings (borrow/return)
 3. Search: simple ILIKE by title/author/genre
 4. Dashboards: minimal counts/lists for each role
 
-### Phase 3: Frontend MVP (Day 3)
+### Phase 3: Frontend MVP
 1. React app (Vite+TS), Tailwind, Router
 2. Auth pages with cookies; Axios withCredentials
-3. Books list/search CRUD, borrow/return
-4. Minimal dashboards
+3. Minimal dashboards
 
-### Phase 4: Tests, Polish, Docs (Day 4)
+### Phase 4: Librarian Business logic
+1. Dashboard (resume, stats, quick search)
+2. Books list/search CRUD
+3. Borrowings borrow/return logic
+4. Members CRUD
+
+### Phase 5: Member Business Logic
+1. Dashboard page
+2. In the dasboard list with top books and search
+3. Borrowings (borrow/return) logic
+4. Alerts
+
+### Phase 6: Tests, Polish, Docs
 1. RSpec: models and request specs for main flows
 2. UX polish: error/loading states
 3. README and seeded credentials
@@ -151,6 +162,7 @@ Note: available_copies will be computed at runtime as total_copies minus active 
 - **Environments**: Development; optional single production instance (Render/Heroku)
 - **Migrations**: Standard Rails workflow
 - **ENV Vars**: Basic secrets via platform or dotenv
+- **Important**: Keep all important business logic in the backend, make a clean API.
 
 ## Success Criteria
 
@@ -171,10 +183,5 @@ Note: available_copies will be computed at runtime as total_copies minus active 
 - **Technical Debt**: Regular code reviews and refactoring
 - **Testing Gaps**: Continuous testing throughout development
 - **Performance Issues**: Early performance testing and optimization
-
-## Timeline Summary
-- **Days 1-2**: Backend foundation and core APIs
-- **Day 3**: Frontend MVP and integration
-- **Day 4**: Tests, polish, docs, demo prep
 
 This plan ensures a systematic approach to building a robust, well-tested, and user-friendly library management system that meets all specified requirements while maintaining clean architecture principles.
