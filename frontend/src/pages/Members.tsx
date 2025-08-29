@@ -4,6 +4,8 @@ import Modal from "../components/Modal";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { Table, THead, TBody, TR, TH, TD } from "../components/Table";
+import { useAuth } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 type Member = {
   id: number;
@@ -13,12 +15,17 @@ type Member = {
 };
 
 export default function MembersPage() {
+  const { state } = useAuth();
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
   const [members, setMembers] = useState<Member[]>([]);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<Partial<Member> & { password?: string }>({ email: "", first_name: "", last_name: "", password: "" });
   const [createErrors, setCreateErrors] = useState<Record<string, string>>({});
+
+  if (state.user && state.user.role !== 'librarian') {
+    return <Navigate to="/" replace />;
+  }
 
   const load = async () => {
     const res = await api.get('/members', { params: { q, page } });

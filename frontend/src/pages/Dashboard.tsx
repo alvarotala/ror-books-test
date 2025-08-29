@@ -4,28 +4,48 @@ import { useAuth } from "../context/AuthContext";
 import { Card, CardContent, CardHeader } from "../components/Card";
 import Input from "../components/Input";
 
+type LibrarianData = {
+  total_books: number;
+  currently_borrowed: number;
+  due_today: number;
+  members_with_overdue: number;
+  top_genres: Record<string, number>;
+  recent_borrowings: Array<{
+    id: number;
+    created_at: string;
+    user: { id: number; email: string; first_name?: string; last_name?: string };
+    book: { id: number; title: string };
+  }>;
+};
+
 export default function Dashboard() {
   const { state } = useAuth();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<LibrarianData | null>(null);
   const [q, setQ] = useState("");
-  const [quickResults, setQuickResults] = useState<any[]>([]);
+  const [quickResults, setQuickResults] = useState<Array<{ id: number; title: string; author: string }>>([]);
 
   useEffect(() => {
     (async () => {
-      const path = state.user?.role === 'librarian' ? '/dashboard/librarian' : '/dashboard/member';
-      const res = await api.get(path);
-      setData(res.data);
+      if (state.user?.role === 'librarian') {
+        const res = await api.get('/dashboard/librarian');
+        setData(res.data as LibrarianData);
+      } else {
+        setData(null);
+      }
     })();
   }, [state.user?.role]);
 
   useEffect(() => {
-    if (state.user?.role !== 'librarian') return;
+    if (!q) {
+      setQuickResults([]);
+      return;
+    }
     const id = setTimeout(async () => {
       const res = await api.get('/books', { params: { q } });
       setQuickResults(res.data);
     }, 300);
     return () => clearTimeout(id);
-  }, [q, state.user?.role]);
+  }, [q]);
 
   return (
     <div className="space-y-6">
@@ -47,7 +67,7 @@ export default function Dashboard() {
               <Input placeholder="Search books by title, author, or genre" value={q} onChange={(e) => setQ(e.target.value)} />
               {q && (
                 <ul className="mt-3 divide-y rounded-md border">
-                  {quickResults.map((b: any) => (
+                  {quickResults.map((b) => (
                     <li key={b.id} className="flex items-center justify-between p-3 text-sm">
                       <span>{b.title} <span className="text-gray-500">by {b.author}</span></span>
                       <a className="text-blue-600" href={`/`}>View</a>
@@ -65,10 +85,10 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <ul className="grid grid-cols-1 gap-2 text-sm">
-                  {data?.top_genres && Object.entries(data.top_genres).map(([genre, count]: any) => (
+                  {data?.top_genres && Object.entries(data.top_genres).map(([genre, count]) => (
                     <li key={genre} className="flex items-center justify-between">
                       <span className="text-gray-700">{genre}</span>
-                      <span className="font-medium">{count as any}</span>
+                      <span className="font-medium">{count as number}</span>
                     </li>
                   ))}
                 </ul>
@@ -81,7 +101,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <ul className="divide-y rounded-md border text-sm">
-                  {data?.recent_borrowings?.map((r: any) => (
+                  {data?.recent_borrowings?.map((r) => (
                     <li key={r.id} className="p-3">
                       <div className="text-xs text-gray-500">{new Date(r.created_at).toLocaleString()}</div>
                       <div><span className="font-medium">{r.user?.first_name || r.user?.last_name ? `${r.user?.first_name || ''} ${r.user?.last_name || ''}`.trim() : r.user?.email}</span> borrowed <span className="font-medium">{r.book?.title}</span></div>
@@ -92,21 +112,12 @@ export default function Dashboard() {
             </Card>
           </div>
         </div>
-      ) : (
-        <Card>
-          <CardHeader>
-            <div className="font-medium">Your activity</div>
-          </CardHeader>
-          <CardContent>
-            <pre className="rounded bg-gray-50 p-3 text-sm">{JSON.stringify(data, null, 2)}</pre>
-          </CardContent>
-        </Card>
-      )}
+      ) : null}
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: any }) {
+function Stat({ label, value }: { label: string; value: number | string | null | undefined }) {
   return (
     <div className="border rounded p-3">
       <div className="text-gray-500 text-sm">{label}</div>

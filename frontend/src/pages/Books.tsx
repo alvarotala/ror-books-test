@@ -122,9 +122,7 @@ export default function Books() {
               <TD className="w-[18%]">{b.isbn}</TD>
               <TD className="w-[10%]">{b.total_copies}</TD>
               <TD className="w-[10%] text-right">
-                {state.user && state.user.role !== 'librarian' && (
-                  <BorrowButton bookId={b.id} />
-                )}
+                {state.user && state.user.role === 'member' && null}
                 {state.user?.role === 'librarian' && (
                   <span className="flex justify-end gap-3 w-full">
                     <EditBookInline book={b} onChange={(updated) => setBooks((prev) => prev.map((x) => x.id === updated.id ? updated : x))} onDelete={() => setBooks((prev) => prev.filter((x) => x.id !== b.id))} />
@@ -146,23 +144,7 @@ export default function Books() {
   );
 }
 
-function BorrowButton({ bookId }: { bookId: number }) {
-  const [loading, setLoading] = useState(false);
-  const onBorrow = async () => {
-    setLoading(true);
-    try {
-      await api.post("/borrowings", { book_id: bookId });
-      alert("Borrowed!");
-    } catch (e: any) {
-      alert(e?.response?.data?.error || "Failed to borrow");
-    } finally {
-      setLoading(false);
-    }
-  };
-  return (
-    <Button variant="ghost" disabled={loading} onClick={onBorrow}>{loading ? "…" : "Borrow"}</Button>
-  );
-}
+// BorrowButton moved to components/BorrowButton
 
 // (Removed unused CreateBookForm component)
 
