@@ -24,9 +24,10 @@ describe('Member Dashboard', () => {
 
   it('renders alerts and lists', async () => {
     getMock.mockResolvedValueOnce({ data: {
-      overdue_books: [],
-      due_soon_books: [],
-      recent_borrowings: [],
+      current_borrowings: [],
+      history: [],
+      top_books: [],
+      alerts: { overdue_count: 0, due_soon_count: 0 },
     } })
     renderWithRouter(<MemberDashboard />)
     await waitFor(() => expect(screen.getByText(/dashboard/i)).toBeInTheDocument())
