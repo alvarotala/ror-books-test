@@ -4,7 +4,26 @@ class BorrowingsController < ApplicationController
 
   def index
     scope = current_user.librarian? ? Borrowing.all : current_user.borrowings
-    scope = scope.includes(:book, :user).order(created_at: :desc)
+    scope = scope.includes(:book, :user)
+
+    # Status filter: borrowed | returned | overdue | all (default)
+    status_param = params[:status].presence
+    if status_param.present? && status_param != 'all' && Borrowing.statuses.key?(status_param)
+      scope = scope.where(status: status_param)
+    end
+
+    # Sorting: default borrowed_at DESC; if sort=due_date then due_date ASC unless direction provided
+    sort_param = params[:sort].presence
+    direction_param = params[:direction].to_s.downcase
+    direction = %w[asc desc].include?(direction_param) ? direction_param.to_sym : nil
+
+    if sort_param == 'due_date'
+      dir = (direction || :asc)
+      scope = scope.order(due_date: dir, id: dir)
+    else
+      dir = (direction || :desc)
+      scope = scope.order(borrowed_at: dir, id: dir)
+    end
     page = params[:page].to_i
     page = 1 if page <= 0
     per_page = 25

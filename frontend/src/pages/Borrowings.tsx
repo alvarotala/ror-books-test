@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { Table, THead, TBody, TR, TH, TD } from "../components/Table";
@@ -18,16 +18,19 @@ type Borrowing = {
 export default function BorrowingsPage() {
   const [items, setItems] = useState<Borrowing[]>([]);
   const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<"borrowed_at" | "due_date">("borrowed_at");
+  const [direction, setDirection] = useState<"asc" | "desc">("desc");
+  const [status, setStatus] = useState<"all" | "borrowed" | "returned" | "overdue">("all");
   const { state } = useAuth();
 
-  const load = async () => {
-    const res = await api.get("/borrowings", { params: { page } });
+  const load = useCallback(async () => {
+    const res = await api.get("/borrowings", { params: { page, sort, status, direction } });
     setItems(res.data);
-  };
+  }, [page, sort, status, direction]);
 
   useEffect(() => {
     load();
-  }, [page]);
+  }, [load]);
 
   // No client-side clamp needed; backend paginates per page
 
@@ -38,6 +41,21 @@ export default function BorrowingsPage() {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-700">Status</label>
+          <select
+            className="rounded border border-gray-300 px-2 py-1 text-sm"
+            value={status}
+            onChange={(e) => { setStatus(e.target.value as "all" | "borrowed" | "returned" | "overdue"); setPage(1); }}
+          >
+            <option value="all">All</option>
+            <option value="borrowed">Borrowed</option>
+            <option value="overdue">Overdue</option>
+            <option value="returned">Returned</option>
+          </select>
+        </div>
+      </div>
       <Table className="table-fixed">
         <THead>
           <TR>
@@ -45,8 +63,46 @@ export default function BorrowingsPage() {
               ? <TH className="w-[22%]">Member</TH>
               : null}
             <TH className={state.user?.role === 'librarian' ? "w-[34%]" : "w-[50%]"}>Book</TH>
-            <TH className={state.user?.role === 'librarian' ? "w-[12%]" : "w-[16%]"}>Borrowed</TH>
-            <TH className={state.user?.role === 'librarian' ? "w-[12%]" : "w-[16%]"}>Due</TH>
+            <TH
+              className={state.user?.role === 'librarian' ? "w-[12%] cursor-pointer select-none" : "w-[16%] cursor-pointer select-none"}
+              onClick={() => {
+                if (sort === 'borrowed_at') {
+                  setDirection((d) => (d === 'desc' ? 'asc' : 'desc'));
+                } else {
+                  setSort('borrowed_at');
+                  setDirection('desc');
+                }
+                setPage(1);
+              }}
+              aria-sort={sort === 'borrowed_at' ? (direction === 'asc' ? 'ascending' : 'descending') : undefined}
+            >
+              <span className="inline-flex items-center gap-1">
+                Borrowed
+                {sort === 'borrowed_at' && (
+                  <span aria-hidden="true">{direction === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </span>
+            </TH>
+            <TH
+              className={state.user?.role === 'librarian' ? "w-[12%] cursor-pointer select-none" : "w-[16%] cursor-pointer select-none"}
+              onClick={() => {
+                if (sort === 'due_date') {
+                  setDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
+                } else {
+                  setSort('due_date');
+                  setDirection('asc');
+                }
+                setPage(1);
+              }}
+              aria-sort={sort === 'due_date' ? (direction === 'asc' ? 'ascending' : 'descending') : undefined}
+            >
+              <span className="inline-flex items-center gap-1">
+                Due
+                {sort === 'due_date' && (
+                  <span aria-hidden="true">{direction === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </span>
+            </TH>
             <TH className={state.user?.role === 'librarian' ? "w-[12%]" : "w-[10%]"}>Status</TH>
             <TH className="w-[8%] text-right">Actions</TH>
           </TR>
