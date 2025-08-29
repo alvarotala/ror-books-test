@@ -6,15 +6,15 @@ class Borrowing < ApplicationRecord
 
   validates :borrowed_at, :due_date, presence: true
   validates :status, presence: true
-  validate :prevent_duplicate_active_borrowing
+  validate :prevent_duplicate_active_borrowing, on: :create
   validate :copies_available_to_borrow, on: :create
 
   before_validation :set_defaults, on: :create
 
   scope :active, -> { where(status: :borrowed, returned_at: nil) }
 
-  def return!
-    update!(status: :returned, returned_at: Time.current)
+  def return!(comment: nil)
+    update!(status: :returned, returned_at: Time.current, return_comment: comment.presence)
   end
 
   private

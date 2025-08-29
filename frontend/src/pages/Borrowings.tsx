@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { Table, THead, TBody, TR, TH, TD } from "../components/Table";
 import Badge from "../components/Badge";
 import Button from "../components/Button";
+import Modal from "../components/Modal";
+import Input from "../components/Input";
 
 type Borrowing = {
   id: number;
@@ -24,6 +26,8 @@ export default function BorrowingsPage() {
   const [q, setQ] = useState("");
   const [date, setDate] = useState<string>("");
   const { state } = useAuth();
+  const [returningId, setReturningId] = useState<number | null>(null);
+  const [returnComment, setReturnComment] = useState<string>("");
 
   const load = useCallback(async () => {
     const res = await api.get("/borrowings", { params: { page, sort, status, direction, q: q || undefined, date: date || undefined } });
@@ -36,8 +40,8 @@ export default function BorrowingsPage() {
 
   // No client-side clamp needed; backend paginates per page
 
-  const onReturn = async (id: number) => {
-    await api.post(`/borrowings/${id}/return_book`);
+  const onReturn = async (id: number, comment?: string) => {
+    await api.post(`/borrowings/${id}/return_book`, { comment: comment || undefined });
     await load();
   };
 
@@ -150,7 +154,7 @@ export default function BorrowingsPage() {
               <TD className="w-[8%] text-right">
                 <span className="inline-flex w-full justify-end">
                   {(it.status === 'borrowed') && (
-                    <Button variant="ghost" onClick={() => onReturn(it.id)}>Return</Button>
+                    <Button variant="ghost" onClick={() => { setReturningId(it.id); setReturnComment(""); }}>Return</Button>
                   )}
                 </span>
               </TD>
@@ -158,6 +162,43 @@ export default function BorrowingsPage() {
           ))}
         </TBody>
       </Table>
+      <Modal
+        open={returningId !== null}
+        onClose={() => { setReturningId(null); setReturnComment(""); }}
+        title="Confirm Return"
+        footer={(
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => { setReturningId(null); setReturnComment(""); }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={async () => {
+                if (returningId !== null) {
+                  await onReturn(returningId, returnComment);
+                }
+                setReturningId(null);
+                setReturnComment("");
+              }}
+            >
+              Confirm Return
+            </Button>
+          </>
+        )}
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-gray-700">Are you sure you want to mark this borrowing as returned?</p>
+          <Input
+            label="Optional comment"
+            placeholder="Condition, notes, etc."
+            value={returnComment}
+            onChange={(e) => setReturnComment(e.target.value)}
+          />
+        </div>
+      </Modal>
       {(page > 1 || items.length === 25) && (
         <div className="flex items-center justify-end gap-2">
           <span className="text-sm text-gray-600">Page {page}</span>
