@@ -36,6 +36,10 @@ docker compose exec web bash -lc "bin/rails db:prepare"
 ### Seed data (optional)
 ```bash
 docker compose exec web bash -lc 'bin/rails db:seed'
+
+docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
+
+docker compose exec web bash -lc 'bin/rails db:seed_borrowings'
 ```
 
 ### Open Rails console
@@ -105,18 +109,10 @@ API: http://localhost:3000
 cd ror-books-test
 docker compose up -d
 ```
-Demo credentials:
+Demo credentials: (if seeded)
 Librarian: librarian@example.com / password123
 Member 1: megan@example.com / password123
 Member 2: john@example.com / password123
-
-
-
-### Seed Bestsellers Books
-
-```bash
-docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
-```
 
 
 ### Continuous Integration (GitHub Actions)
