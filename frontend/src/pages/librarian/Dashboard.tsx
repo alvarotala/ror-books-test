@@ -4,7 +4,6 @@ import { useAuth } from "../../context/AuthContext";
 import { Card, CardContent, CardHeader } from "../../components/Card";
 import Input from "../../components/Input";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
 
 type LibrarianData = {
   total_books: number;
@@ -25,7 +24,6 @@ export default function Dashboard() {
   const [data, setData] = useState<LibrarianData | null>(null);
   const [q, setQ] = useState("");
   const [quickResults, setQuickResults] = useState<Array<{ id: number; title: string; author: string }>>([]);
-  const [isMarkingOverdue, setIsMarkingOverdue] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,7 +54,6 @@ export default function Dashboard() {
       return;
     }
 
-    setIsMarkingOverdue(true);
     try {
       const res = await api.post('/dashboard/mark_overdue');
       if (res.data.success) {
@@ -70,8 +67,6 @@ export default function Dashboard() {
     } catch (error) {
       alert('Error occurred while marking overdue books');
       console.error(error);
-    } finally {
-      setIsMarkingOverdue(false);
     }
   };
 
