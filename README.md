@@ -42,6 +42,27 @@ docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
 docker compose exec web bash -lc 'bin/rails db:seed_borrowings'
 ```
 
+### Overdue Book Management
+
+#### Manual Overdue Check (Rake Task)
+To manually trigger the overdue book check from the command line:
+```bash
+docker compose exec web bash -lc "bin/rails overdue:mark_overdue"
+```
+
+This task will:
+- Find all borrowed books past their due date
+- Mark them as overdue
+- Log the overdue books
+- Return a count of books marked as overdue
+- Send emails to users (not implemented for this test)
+
+#### Web Interface (Librarian Dashboard)
+Check the dashboard "Mark Overdue Books" button in the Quick Actions section
+
+** Important **: This option is only for testing, it's not a good practice to do this, we usually use background jobs. But it's just for now ;)
+
+
 ### Open Rails console
 ```bash
 docker compose exec web bash -lc "bin/rails console"

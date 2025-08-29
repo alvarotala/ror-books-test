@@ -6,7 +6,8 @@ class OverdueService
     return { count: 0 } if overdue_borrowings.empty?
     
     # Update status to overdue
-    if overdue_borrowings.update_all(status: :overdue) > 0
+    updated_count = overdue_borrowings.update_all(status: :overdue)
+    if updated_count > 0
       send_overdue_notifications(overdue_borrowings)
     end
 

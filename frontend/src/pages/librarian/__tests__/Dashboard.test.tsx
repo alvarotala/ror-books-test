@@ -5,7 +5,8 @@ import Dashboard from '../Dashboard'
 
 vi.mock('../../../api/client', () => {
   const get = vi.fn()
-  return { api: { get } }
+  const post = vi.fn()
+  return { api: { get, post } }
 })
 
 vi.mock('../../../context/AuthContext', () => ({
@@ -25,7 +26,7 @@ describe('Librarian Dashboard', () => {
         total_books: 10,
         currently_borrowed: 2,
         due_today: 1,
-        members_with_overdue: 3,
+        overdue_books_count: 3,
         top_genres: { Fiction: 5, SciFi: 2 },
         recent_borrowings: [
           { id: 1, created_at: new Date('2024-01-01').toISOString(), user: { id: 1, email: 'a@b.com' }, book: { id: 1, title: 'B1' } },
@@ -41,7 +42,7 @@ describe('Librarian Dashboard', () => {
   })
 
   it('performs debounced quick search', async () => {
-    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { total_books: 0, currently_borrowed: 0, due_today: 0, members_with_overdue: 0, top_genres: {}, recent_borrowings: [] } })
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { total_books: 0, currently_borrowed: 0, due_today: 0, overdue_books_count: 0, top_genres: {}, recent_borrowings: [] } })
     renderWithRouter(<Dashboard />)
     await waitFor(() => expect(api.get).toHaveBeenCalled())
 
@@ -50,6 +51,34 @@ describe('Librarian Dashboard', () => {
 
     // Debounce resolves naturally
     await screen.findByText('The Book')
+  })
+
+  it('shows mark overdue button and handles click', async () => {
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { total_books: 0, currently_borrowed: 0, due_today: 0, overdue_books_count: 0, top_genres: {}, recent_borrowings: [] }
+    })
+    
+    renderWithRouter(<Dashboard />)
+    await waitFor(() => expect(api.get).toHaveBeenCalled())
+
+    const markOverdueButton = screen.getByText('Mark Overdue Books')
+    expect(markOverdueButton).toBeInTheDocument()
+
+    // Mock the mark overdue API call
+    ;(api.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { success: true, message: 'Successfully marked 5 books as overdue', count: 5 }
+    })
+
+    // Mock the dashboard refresh call
+    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { total_books: 0, currently_borrowed: 0, due_today: 0, overdue_books_count: 5, top_genres: {}, recent_borrowings: [] }
+    })
+
+    fireEvent.click(markOverdueButton)
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/dashboard/mark_overdue')
+    })
   })
 })
 

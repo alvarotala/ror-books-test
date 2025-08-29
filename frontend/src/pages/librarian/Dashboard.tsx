@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Card, CardContent, CardHeader } from "../../components/Card";
 import Input from "../../components/Input";
 import { useNavigate } from "react-router-dom";
+import Button from "../../components/Button";
 
 type LibrarianData = {
   total_books: number;
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const [data, setData] = useState<LibrarianData | null>(null);
   const [q, setQ] = useState("");
   const [quickResults, setQuickResults] = useState<Array<{ id: number; title: string; author: string }>>([]);
+  const [isMarkingOverdue, setIsMarkingOverdue] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +50,30 @@ export default function Dashboard() {
     }, 300);
     return () => clearTimeout(id);
   }, [q]);
+
+  const handleMarkOverdue = async () => {
+    if (!confirm('Are you sure you want to manually trigger the overdue check? This will mark all borrowed books past their due date as overdue.')) {
+      return;
+    }
+
+    setIsMarkingOverdue(true);
+    try {
+      const res = await api.post('/dashboard/mark_overdue');
+      if (res.data.success) {
+        alert(res.data.message);
+        // Refresh dashboard data
+        const dashboardRes = await api.get('/dashboard/librarian');
+        setData(dashboardRes.data as LibrarianData);
+      } else {
+        alert('Error: ' + res.data.error);
+      }
+    } catch (error) {
+      alert('Error occurred while marking overdue books');
+      console.error(error);
+    } finally {
+      setIsMarkingOverdue(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -135,6 +161,12 @@ export default function Dashboard() {
                 </ul>
               </CardContent>
             </Card>
+          </div>
+
+          <div>
+              <p className="text-sm mt-2">
+                <a onClick={handleMarkOverdue} className="text-blue-600 hover:underline cursor-pointer">Manually trigger the overdue</a> check to mark borrowed books past their due date as overdue.
+              </p>
           </div>
         </div>
       ) : null}

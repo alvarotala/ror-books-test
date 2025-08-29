@@ -15,6 +15,24 @@ class DashboardsController < ApplicationController
     render json: data
   end
 
+  def mark_overdue
+    return render json: { error: 'Forbidden' }, status: :forbidden unless current_user.librarian?
+
+    begin
+      result = OverdueService.mark_overdue_books
+      render json: { 
+        success: true, 
+        message: "Successfully marked #{result[:count]} books as overdue",
+        count: result[:count]
+      }
+    rescue => e
+      render json: { 
+        success: false, 
+        error: e.message 
+      }, status: :internal_server_error
+    end
+  end
+
   def member
     return render json: { error: 'Forbidden' }, status: :forbidden unless current_user.member?
 
