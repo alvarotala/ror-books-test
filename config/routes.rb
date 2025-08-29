@@ -5,6 +5,7 @@ Rails.application.routes.draw do
 
   # Auth/session helper JSON endpoints for frontend
   post "/session", to: "sessions#create"
+  match "/session", to: "sessions#preflight", via: :options
   delete "/session", to: "sessions#destroy"
   get "/session/current", to: "sessions#current"
   get "/csrf", to: "sessions#csrf"

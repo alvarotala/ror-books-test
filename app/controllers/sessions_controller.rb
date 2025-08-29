@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:create, :csrf, :current]
+  skip_before_action :authenticate_user!, only: [:create, :csrf, :current, :preflight]
 
   def create
     user = User.find_for_authentication(email: params[:email])
@@ -26,6 +26,11 @@ class SessionsController < ApplicationController
 
   def csrf
     render json: { csrfToken: form_authenticity_token }
+  end
+
+  # Handle CORS preflight for /session
+  def preflight
+    head :no_content
   end
 end
 

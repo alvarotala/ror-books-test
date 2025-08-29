@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { Table, THead, TBody, TR, TH, TD } from "../components/Table";
+import Badge from "../components/Badge";
+import Button from "../components/Button";
 
 type Borrowing = {
   id: number;
@@ -31,38 +34,41 @@ export default function BorrowingsPage() {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Borrowings</h1>
-      <table className="w-full text-left border">
-        <thead>
-          <tr className="border-b">
-            {state.user?.role === 'librarian' && <th className="p-2">Member</th>}
-            <th className="p-2">Book</th>
-            <th className="p-2">Borrowed</th>
-            <th className="p-2">Due</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="space-y-4">
+      <Table>
+        <THead>
+          <TR>
+            {state.user?.role === 'librarian' && <TH>Member</TH>}
+            <TH>Book</TH>
+            <TH>Borrowed</TH>
+            <TH>Due</TH>
+            <TH>Status</TH>
+            <TH>Actions</TH>
+          </TR>
+        </THead>
+        <TBody>
           {items.map((it) => (
-            <tr key={it.id} className="border-b">
+            <TR key={it.id}>
               {state.user?.role === 'librarian' && (
-                <td className="p-2">{it.user ? (it.user.first_name || it.user.last_name ? `${it.user.first_name || ''} ${it.user.last_name || ''}`.trim() : it.user.email) : '-'}</td>
+                <TD>{it.user ? (it.user.first_name || it.user.last_name ? `${it.user.first_name || ''} ${it.user.last_name || ''}`.trim() : it.user.email) : '-'}</TD>
               )}
-              <td className="p-2">{it.book.title} <span className="text-gray-500">by {it.book.author}</span></td>
-              <td className="p-2">{new Date(it.borrowed_at).toLocaleDateString()}</td>
-              <td className="p-2">{new Date(it.due_date).toLocaleDateString()}</td>
-              <td className="p-2">{it.status}</td>
-              <td className="p-2">
+              <TD>{it.book.title} <span className="text-gray-500">by {it.book.author}</span></TD>
+              <TD>{new Date(it.borrowed_at).toLocaleDateString()}</TD>
+              <TD>{new Date(it.due_date).toLocaleDateString()}</TD>
+              <TD>
+                {it.status === 'borrowed' && <Badge variant="info">Borrowed</Badge>}
+                {it.status === 'returned' && <Badge variant="success">Returned</Badge>}
+                {it.status === 'overdue' && <Badge variant="danger">Overdue</Badge>}
+              </TD>
+              <TD>
                 {(it.status === 'borrowed') && (
-                  <button className="text-blue-600" onClick={() => onReturn(it.id)}>Return</button>
+                  <Button variant="ghost" onClick={() => onReturn(it.id)}>Return</Button>
                 )}
-              </td>
-            </tr>
+              </TD>
+            </TR>
           ))}
-        </tbody>
-      </table>
+        </TBody>
+      </Table>
     </div>
   );
 }

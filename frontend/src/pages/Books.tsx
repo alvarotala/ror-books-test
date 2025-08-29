@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import { Table, THead, TBody, TR, TH, TD } from "../components/Table";
 
 type Book = {
   id: number;
@@ -26,13 +29,15 @@ export default function Books() {
   }, [q]);
 
   return (
-    <div>
-      <div className="flex gap-2 items-center mb-4">
-        <input className="border p-2 flex-1" placeholder="Search books" value={q} onChange={(e) => setQ(e.target.value)} />
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <div className="flex-1">
+          <Input placeholder="Search books" value={q} onChange={(e) => setQ(e.target.value)} />
+        </div>
         {state.user?.role === 'librarian' && (
-          <button className="bg-green-600 text-white px-3 py-2 rounded" onClick={() => setCreating((v) => !v)}>
+          <Button variant={creating ? "ghost" : "primary"} onClick={() => setCreating((v) => !v)}>
             {creating ? "Cancel" : "New Book"}
-          </button>
+          </Button>
         )}
       </div>
       {creating && state.user?.role === 'librarian' && (
@@ -48,26 +53,26 @@ export default function Books() {
           }}
         />
       )}
-      <table className="w-full text-left border">
-        <thead>
-          <tr className="border-b">
-            <th className="p-2">Title</th>
-            <th className="p-2">Author</th>
-            <th className="p-2">Genre</th>
-            <th className="p-2">ISBN</th>
-            <th className="p-2">Copies</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <THead>
+          <TR>
+            <TH>Title</TH>
+            <TH>Author</TH>
+            <TH>Genre</TH>
+            <TH>ISBN</TH>
+            <TH>Copies</TH>
+            <TH>Actions</TH>
+          </TR>
+        </THead>
+        <TBody>
           {books.map((b) => (
-            <tr key={b.id} className="border-b">
-              <td className="p-2">{b.title}</td>
-              <td className="p-2">{b.author}</td>
-              <td className="p-2">{b.genre}</td>
-              <td className="p-2">{b.isbn}</td>
-              <td className="p-2">{b.total_copies}</td>
-              <td className="p-2">
+            <TR key={b.id}>
+              <TD>{b.title}</TD>
+              <TD>{b.author}</TD>
+              <TD>{b.genre}</TD>
+              <TD>{b.isbn}</TD>
+              <TD>{b.total_copies}</TD>
+              <TD>
                 {state.user && state.user.role !== 'librarian' && (
                   <BorrowButton bookId={b.id} />
                 )}
@@ -76,11 +81,11 @@ export default function Books() {
                     <EditBookInline book={b} onChange={(updated) => setBooks((prev) => prev.map((x) => x.id === updated.id ? updated : x))} onDelete={() => setBooks((prev) => prev.filter((x) => x.id !== b.id))} />
                   </span>
                 )}
-              </td>
-            </tr>
+              </TD>
+            </TR>
           ))}
-        </tbody>
-      </table>
+        </TBody>
+      </Table>
     </div>
   );
 }
@@ -99,20 +104,20 @@ function BorrowButton({ bookId }: { bookId: number }) {
     }
   };
   return (
-    <button className="text-blue-600" disabled={loading} onClick={onBorrow}>{loading ? "..." : "Borrow"}</button>
+    <Button variant="ghost" disabled={loading} onClick={onBorrow}>{loading ? "…" : "Borrow"}</Button>
   );
 }
 
 function CreateBookForm({ value, onChange, onSubmit }: { value: Partial<Book>; onChange: (v: Partial<Book>) => void; onSubmit: () => Promise<void>; }) {
   return (
-    <form className="mb-4 grid grid-cols-5 gap-2 items-end" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
-      <input className="border p-2" placeholder="Title" value={value.title || ''} onChange={(e) => onChange({ ...value, title: e.target.value })} />
-      <input className="border p-2" placeholder="Author" value={value.author || ''} onChange={(e) => onChange({ ...value, author: e.target.value })} />
-      <input className="border p-2" placeholder="Genre" value={value.genre || ''} onChange={(e) => onChange({ ...value, genre: e.target.value })} />
-      <input className="border p-2" placeholder="ISBN" value={value.isbn || ''} onChange={(e) => onChange({ ...value, isbn: e.target.value })} />
-      <div className="flex gap-2">
-        <input className="border p-2 w-24" placeholder="Copies" type="number" value={value.total_copies || 1} onChange={(e) => onChange({ ...value, total_copies: Number(e.target.value) })} />
-        <button className="bg-blue-600 text-white px-3 py-2 rounded" type="submit">Create</button>
+    <form className="grid grid-cols-5 items-end gap-2" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
+      <Input placeholder="Title" value={value.title || ''} onChange={(e) => onChange({ ...value, title: e.target.value })} />
+      <Input placeholder="Author" value={value.author || ''} onChange={(e) => onChange({ ...value, author: e.target.value })} />
+      <Input placeholder="Genre" value={value.genre || ''} onChange={(e) => onChange({ ...value, genre: e.target.value })} />
+      <Input placeholder="ISBN" value={value.isbn || ''} onChange={(e) => onChange({ ...value, isbn: e.target.value })} />
+      <div className="flex items-center gap-2">
+        <Input className="w-24" placeholder="Copies" type="number" value={value.total_copies || 1} onChange={(e) => onChange({ ...value, total_copies: Number(e.target.value) })} />
+        <Button type="submit">Create</Button>
       </div>
     </form>
   );
@@ -148,22 +153,22 @@ function EditBookInline({ book, onChange, onDelete }: { book: Book; onChange: (b
   if (!editing) {
     return (
       <>
-        <button className="text-blue-600" onClick={() => setEditing(true)}>Edit</button>
-        <button className="text-red-600" onClick={onRemove} disabled={loading}>Delete</button>
+        <Button variant="ghost" onClick={() => setEditing(true)}>Edit</Button>
+        <Button variant="danger" onClick={onRemove} disabled={loading}>Delete</Button>
       </>
     );
   }
 
   return (
-    <div className="grid grid-cols-5 gap-2 items-end">
-      <input className="border p-1" value={form.title || ''} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-      <input className="border p-1" value={form.author || ''} onChange={(e) => setForm({ ...form, author: e.target.value })} />
-      <input className="border p-1" value={form.genre || ''} onChange={(e) => setForm({ ...form, genre: e.target.value })} />
-      <input className="border p-1" value={form.isbn || ''} onChange={(e) => setForm({ ...form, isbn: e.target.value })} />
-      <div className="flex gap-2 items-center">
-        <input className="border p-1 w-20" type="number" value={form.total_copies || 1} onChange={(e) => setForm({ ...form, total_copies: Number(e.target.value) })} />
-        <button className="text-green-700" onClick={onSave} disabled={loading}>Save</button>
-        <button className="text-gray-600" onClick={() => setEditing(false)}>Cancel</button>
+    <div className="grid grid-cols-5 items-end gap-2">
+      <Input value={form.title || ''} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+      <Input value={form.author || ''} onChange={(e) => setForm({ ...form, author: e.target.value })} />
+      <Input value={form.genre || ''} onChange={(e) => setForm({ ...form, genre: e.target.value })} />
+      <Input value={form.isbn || ''} onChange={(e) => setForm({ ...form, isbn: e.target.value })} />
+      <div className="flex items-center gap-2">
+        <Input className="w-20" type="number" value={form.total_copies || 1} onChange={(e) => setForm({ ...form, total_copies: Number(e.target.value) })} />
+        <Button variant="secondary" onClick={onSave} disabled={loading}>Save</Button>
+        <Button variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
       </div>
     </div>
   );

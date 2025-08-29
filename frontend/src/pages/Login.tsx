@@ -10,8 +10,10 @@ export default function Login() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
-    navigate("/");
+    const ok = await login(email, password);
+    if (ok) {
+      navigate("/");
+    }
   };
 
   return (

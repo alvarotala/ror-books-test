@@ -22,7 +22,7 @@ type Action =
 
 const AuthContext = createContext<{
   state: State;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 } | null>(null);
 
@@ -54,14 +54,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     dispatch({ type: "loading" });
     await ensureCsrfToken();
     try {
       const res = await api.post("/session", { email, password });
       dispatch({ type: "loaded", user: res.data?.user ?? null });
+      return true;
     } catch (e: any) {
-      dispatch({ type: "error", error: e?.response?.data?.error || "Login failed" });
+      dispatch({ type: "error", error: e?.response?.data?.error || e?.message || "Login failed" });
+      return false;
     }
   };
 

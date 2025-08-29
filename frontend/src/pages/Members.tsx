@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import { Table, THead, TBody, TR, TH, TD } from "../components/Table";
 
 type Member = {
   id: number;
@@ -40,40 +43,41 @@ export default function MembersPage() {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Members</h1>
-      <div className="flex gap-2 items-center mb-4">
-        <input className="border p-2 flex-1" placeholder="Search members" value={q} onChange={(e) => setQ(e.target.value)} />
-        <button className="bg-green-600 text-white px-3 py-2 rounded" onClick={() => setCreating((v) => !v)}>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <div className="flex-1">
+          <Input placeholder="Search members" value={q} onChange={(e) => setQ(e.target.value)} />
+        </div>
+        <Button variant={creating ? 'ghost' : 'primary'} onClick={() => setCreating((v) => !v)}>
           {creating ? 'Cancel' : 'New Member'}
-        </button>
+        </Button>
       </div>
       {creating && (
-        <form className="grid grid-cols-4 gap-2 items-end mb-4" onSubmit={(e) => { e.preventDefault(); onCreate(); }}>
-          <input className="border p-2" placeholder="Email" value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <input className="border p-2" placeholder="First name" value={form.first_name || ''} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
-          <input className="border p-2" placeholder="Last name" value={form.last_name || ''} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
-          <div className="flex gap-2 items-center">
-            <input className="border p-2" placeholder="Temp password" type="password" value={form.password || ''} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-            <button className="bg-blue-600 text-white px-3 py-2 rounded" type="submit">Create</button>
+        <form className="grid grid-cols-4 items-end gap-2" onSubmit={(e) => { e.preventDefault(); onCreate(); }}>
+          <Input placeholder="Email" value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <Input placeholder="First name" value={form.first_name || ''} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
+          <Input placeholder="Last name" value={form.last_name || ''} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
+          <div className="flex items-center gap-2">
+            <Input placeholder="Temp password" type="password" value={form.password || ''} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+            <Button type="submit">Create</Button>
           </div>
         </form>
       )}
-      <table className="w-full text-left border">
-        <thead>
-          <tr className="border-b">
-            <th className="p-2">Email</th>
-            <th className="p-2">First name</th>
-            <th className="p-2">Last name</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <THead>
+          <TR>
+            <TH>Email</TH>
+            <TH>First name</TH>
+            <TH>Last name</TH>
+            <TH>Actions</TH>
+          </TR>
+        </THead>
+        <TBody>
           {members.map((m) => (
             <Row key={m.id} m={m} onUpdate={onUpdate} onDelete={onDelete} />
           ))}
-        </tbody>
-      </table>
+        </TBody>
+      </Table>
     </div>
   );
 }
@@ -95,28 +99,32 @@ function Row({ m, onUpdate, onDelete }: { m: Member; onUpdate: (id: number, attr
 
   if (!editing) {
     return (
-      <tr className="border-b">
-        <td className="p-2">{m.email}</td>
-        <td className="p-2">{m.first_name}</td>
-        <td className="p-2">{m.last_name}</td>
-        <td className="p-2">
-          <button className="text-blue-600" onClick={() => setEditing(true)}>Edit</button>
-          <button className="text-red-600 ml-3" onClick={() => onDelete(m.id)} disabled={loading}>Delete</button>
-        </td>
-      </tr>
+      <TR>
+        <TD>{m.email}</TD>
+        <TD>{m.first_name}</TD>
+        <TD>{m.last_name}</TD>
+        <TD>
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => setEditing(true)}>Edit</Button>
+            <Button variant="danger" onClick={() => onDelete(m.id)} disabled={loading}>Delete</Button>
+          </div>
+        </TD>
+      </TR>
     )
   }
 
   return (
-    <tr className="border-b">
-      <td className="p-2"><input className="border p-1 w-full" value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} /></td>
-      <td className="p-2"><input className="border p-1 w-full" value={form.first_name || ''} onChange={(e) => setForm({ ...form, first_name: e.target.value })} /></td>
-      <td className="p-2"><input className="border p-1 w-full" value={form.last_name || ''} onChange={(e) => setForm({ ...form, last_name: e.target.value })} /></td>
-      <td className="p-2">
-        <button className="text-green-700" onClick={save} disabled={loading}>Save</button>
-        <button className="text-gray-600 ml-3" onClick={() => setEditing(false)}>Cancel</button>
-      </td>
-    </tr>
+    <TR>
+      <TD><Input value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} /></TD>
+      <TD><Input value={form.first_name || ''} onChange={(e) => setForm({ ...form, first_name: e.target.value })} /></TD>
+      <TD><Input value={form.last_name || ''} onChange={(e) => setForm({ ...form, last_name: e.target.value })} /></TD>
+      <TD>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={save} disabled={loading}>Save</Button>
+          <Button variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+        </div>
+      </TD>
+    </TR>
   );
 }
 

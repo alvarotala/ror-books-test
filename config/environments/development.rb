@@ -74,4 +74,8 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Allow cross-origin POSTs with valid CSRF token from the Vite dev server
+  # by disabling the origin check in development (token verification still applies).
+  config.action_controller.forgery_protection_origin_check = false
 end
