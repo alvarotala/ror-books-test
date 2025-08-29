@@ -9,7 +9,7 @@ type LibrarianData = {
   total_books: number;
   currently_borrowed: number;
   due_today: number;
-  members_with_overdue: number;
+  overdue_books_count: number;
   top_genres: Record<string, number>;
   recent_borrowings: Array<{
     id: number;
@@ -72,13 +72,13 @@ export default function Dashboard() {
                 clickable
               />
             )}
-            {data && data.members_with_overdue > 0 && (
+            {data && data.overdue_books_count > 0 && (
               <div 
                 className="border-2 border-red-500 rounded-lg p-4 bg-red-50 cursor-pointer hover:bg-red-100 transition-colors"
                 onClick={() => navigate('/borrowings?status=overdue')}
               >
-                <div className="text-red-700 text-sm font-semibold">Members with overdue</div>
-                <div className="text-red-800 text-3xl font-bold">{data.members_with_overdue}</div>
+                <div className="text-red-700 text-sm font-semibold">Overdue books</div>
+                <div className="text-red-800 text-3xl font-bold">{data.overdue_books_count}</div>
               </div>
             )}
           </div>
