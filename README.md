@@ -55,7 +55,7 @@ docker compose exec web bash -lc "bundle exec rspec"
 
 ### Frontend tests (Vitest)
 
-Run in Docker (recommended):
+Run in Docker with clean install (recommended):
 ```bash
 docker compose exec frontend sh -lc "npm ci || npm i; npm run test:run"
 ```
