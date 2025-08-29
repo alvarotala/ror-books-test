@@ -3,7 +3,6 @@ import { api } from "../../api/client";
 import { Table, THead, TBody, TR, TH, TD } from "../../components/Table";
 import Badge from "../../components/Badge";
 import Button from "../../components/Button";
-import Input from "../../components/Input";
 
 type Borrowing = {
   id: number;
@@ -38,10 +37,11 @@ export default function MemberBorrowingsPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Input
+          <input
             value={q}
             onChange={(e) => { setQ(e.target.value); setPage(1); }}
             placeholder="Search book..."
+            className="w-64 rounded border border-gray-300 px-2 py-1 text-sm"
           />
           <input
             type="date"
