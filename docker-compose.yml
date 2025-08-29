@@ -24,6 +24,8 @@ services:
       db:
         condition: service_healthy
     environment:
+      RAILS_ENV: development
+
       DATABASE_URL_DEV: postgresql://postgres:postgres@db:5432/ror_books_dev
       DATABASE_URL_TEST: postgresql://postgres:postgres@db:5432/ror_books_test
       DATABASE_URL_PROD: postgresql://postgres:postgres@db:5432/ror_books_prod
@@ -32,7 +34,7 @@ services:
     volumes:
       - .:/app
       - bundle-cache:/usr/local/bundle
-    command: bash -lc "export RAILS_ENV=development; bundle check || bundle install; (bin/rails db:prepare || true); bin/rails server -b 0.0.0.0 -p 3000"
+    command: bash -lc "bundle check || bundle install && (bin/rails db:prepare || true) && bin/rails server -b 0.0.0.0 -p 3000"
 
   frontend:
     image: node:20-alpine
