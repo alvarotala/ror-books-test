@@ -11,15 +11,15 @@ docker compose run --rm web bash -lc "rails new . --force --database=postgresql 
 ```
 
 ### Configure database.yml (only if missing)
-Set adapter and host env via `DATABASE_URL` or use this minimal config:
+Set adapter and host env via `DATABASE_URL_DEV` or use this minimal config:
 ```yaml
 default: &default
   adapter: postgresql
   encoding: unicode
-  url: <%= ENV.fetch("DATABASE_URL") %>
 
 development:
   <<: *default
+  url: <%= ENV["DATABASE_URL_DEV"] %>
   database: ror_books_dev
 ```
 
@@ -35,7 +35,7 @@ docker compose exec web bash -lc "bin/rails db:prepare"
 
 ### Seed data (optional)
 ```bash
-docker compose exec web bash -lc 'bin/rails db:prepare && bin/rails db:seed'
+docker compose exec web bash -lc 'bin/rails db:seed'
 ```
 
 ### Open Rails console
@@ -45,7 +45,7 @@ docker compose exec web bash -lc "bin/rails console"
 
 ### Prepare test DB (RSpec)
 ```bash
-docker compose exec web bash -lc "unset DATABASE_URL; RAILS_ENV=test bin/rails db:environment:set RAILS_ENV=test && RAILS_ENV=test bin/rails db:prepare"
+docker compose exec web bash -lc "RAILS_ENV=test bin/rails db:prepare"
 ```
 
 ### Run tests (RSpec)
