@@ -36,4 +36,12 @@ class Book < ApplicationRecord
       .select('books.*')
       .select(Arel.sql("CASE WHEN (#{is_member_sql}) AND (COALESCE(active.active_count, 0) < books.total_copies) AND user_active.book_id IS NULL THEN TRUE ELSE FALSE END AS can_borrow"))
   end
+
+  # Search scope for filtering books by title, author, or genre
+  scope :search, ->(query) do
+    return all unless query.present?
+    
+    pattern = "%#{query.strip}%"
+    where("title ILIKE ? OR author ILIKE ? OR genre ILIKE ?", pattern, pattern, pattern)
+  end
 end

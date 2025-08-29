@@ -5,7 +5,7 @@ class BooksController < ApplicationController
   def index
     respond_to do |format|
       format.json do
-        scope = apply_search(Book.with_can_borrow_for(current_user))
+        scope = Book.with_can_borrow_for(current_user).search(params[:q])
         page = params[:page].to_i
         page = 1 if page <= 0
         per_page = 25
@@ -55,14 +55,6 @@ class BooksController < ApplicationController
 
   def book_params
     params.require(:book).permit(:title, :author, :genre, :isbn, :total_copies)
-  end
-
-  def apply_search(scope)
-    q = params[:q].to_s.strip
-    return scope unless q.present?
-
-    pattern = "%#{q}%"
-    scope.where("title ILIKE ? OR author ILIKE ? OR genre ILIKE ?", pattern, pattern, pattern)
   end
 
   def require_librarian!
