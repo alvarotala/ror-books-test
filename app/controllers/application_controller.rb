@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
+  skip_forgery_protection if Rails.env.test?
   before_action :authenticate_user!, unless: :devise_controller?
 
   # Render JSON errors in a consistent structure
