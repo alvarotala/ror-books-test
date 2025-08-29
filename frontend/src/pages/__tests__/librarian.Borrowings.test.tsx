@@ -24,8 +24,11 @@ describe('Librarian Borrowings', () => {
   beforeEach(() => getMock.mockReset())
 
   it('loads and displays rows', async () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5); // 5 days in the future
+    
     getMock.mockResolvedValueOnce({ data: [
-      { id: 1, book: { id: 1, title: 'T1', author: 'A1' }, borrowed_at: new Date().toISOString(), due_date: new Date().toISOString(), status: 'borrowed', user: { id: 1, email: 'm@e.com' } },
+      { id: 1, book: { id: 1, title: 'T1', author: 'A1' }, borrowed_at: new Date().toISOString(), due_date: futureDate.toISOString(), status: 'borrowed', user: { id: 1, email: 'm@e.com' } },
     ] })
     renderWithRouter(<BorrowingsPage />)
     await waitFor(() => expect(screen.getByText('T1')).toBeInTheDocument())

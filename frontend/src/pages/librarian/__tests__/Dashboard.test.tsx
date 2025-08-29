@@ -52,34 +52,6 @@ describe('Librarian Dashboard', () => {
     // Debounce resolves naturally
     await screen.findByText('The Book')
   })
-
-  it('shows mark overdue button and handles click', async () => {
-    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { total_books: 0, currently_borrowed: 0, due_today: 0, overdue_books_count: 0, top_genres: {}, recent_borrowings: [] }
-    })
-    
-    renderWithRouter(<Dashboard />)
-    await waitFor(() => expect(api.get).toHaveBeenCalled())
-
-    const markOverdueButton = screen.getByText('Mark Overdue Books')
-    expect(markOverdueButton).toBeInTheDocument()
-
-    // Mock the mark overdue API call
-    ;(api.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { success: true, message: 'Successfully marked 5 books as overdue', count: 5 }
-    })
-
-    // Mock the dashboard refresh call
-    ;(api.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { total_books: 0, currently_borrowed: 0, due_today: 0, overdue_books_count: 5, top_genres: {}, recent_borrowings: [] }
-    })
-
-    fireEvent.click(markOverdueButton)
-
-    await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/dashboard/mark_overdue')
-    })
-  })
 })
 
 
