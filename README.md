@@ -82,3 +82,10 @@ Member: member@example.com / password123
 
 
 
+### Seed Bestsellers Books
+
+```bash
+docker compose exec web bash -lc "bin/rails db:seed_bestsellers"
+```
+
+
