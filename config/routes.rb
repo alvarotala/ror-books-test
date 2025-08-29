@@ -17,6 +17,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :members
+
   namespace :dashboard do
     get :librarian, to: "/dashboards#librarian"
     get :member, to: "/dashboards#member"

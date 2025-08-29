@@ -4,7 +4,8 @@ class BorrowingsController < ApplicationController
 
   def index
     scope = current_user.librarian? ? Borrowing.all : current_user.borrowings
-    render json: scope.includes(:book).order(created_at: :desc)
+    scope = scope.includes(:book, :user).order(created_at: :desc)
+    render json: scope.as_json(include: { book: {}, user: { only: [:id, :email, :first_name, :last_name] } })
   end
 
   def create

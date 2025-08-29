@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
@@ -9,6 +8,8 @@ export default function App() {
       <nav className="p-3 border-b flex items-center gap-4">
         <Link to="/">Books</Link>
         <Link to="/dashboard">Dashboard</Link>
+        <Link to="/borrowings">Borrowings</Link>
+        {state.user?.role === 'librarian' && <Link to="/members">Members</Link>}
         <div className="ml-auto">
           {state.user ? (
             <button className="text-blue-600" onClick={logout}>Logout ({state.user.email})</button>

@@ -8,6 +8,8 @@ import Login from './pages/Login'
 
 const Books = React.lazy(() => import('./pages/Books'))
 const Dashboard = React.lazy(() => import('./pages/Dashboard'))
+const Borrowings = React.lazy(() => import('./pages/Borrowings'))
+const Members = React.lazy(() => import('./pages/Members'))
 
 const router = createBrowserRouter([
   {
@@ -16,6 +18,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <React.Suspense fallback={<div>Loading…</div>}><Books /></React.Suspense> },
       { path: 'dashboard', element: <React.Suspense fallback={<div>Loading…</div>}><Dashboard /></React.Suspense> },
+      { path: 'borrowings', element: <React.Suspense fallback={<div>Loading…</div>}><Borrowings /></React.Suspense> },
+      { path: 'members', element: <React.Suspense fallback={<div>Loading…</div>}><Members /></React.Suspense> },
       { path: 'login', element: <Login /> },
     ]
   }
