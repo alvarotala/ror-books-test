@@ -43,14 +43,14 @@ docker compose exec web bash -lc 'bin/rails db:prepare && bin/rails db:seed'
 docker compose exec web bash -lc "bin/rails console"
 ```
 
-### Run tests (RSpec)
-```bash
-docker compose exec web bash -lc "bundle exec rspec"
-```
-
 ### Prepare test DB (RSpec)
 ```bash
 docker compose exec web bash -lc "unset DATABASE_URL; RAILS_ENV=test bin/rails db:environment:set RAILS_ENV=test && RAILS_ENV=test bin/rails db:prepare"
+```
+
+### Run tests (RSpec)
+```bash
+docker compose exec web bash -lc "RAILS_ENV=test bundle exec rspec"
 ```
 
 ### Check logs
