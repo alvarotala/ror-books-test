@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../api/client";
 import Input from "../../components/Input";
 import { Table, THead, TBody, TR, TH, TD } from "../../components/Table";
+import Button from "../../components/Button";
 import BorrowButton from "../../components/BorrowButton";
 
 type Book = {
@@ -59,8 +60,8 @@ export default function MemberBooks() {
       {(page > 1 || books.length === 25) && (
         <div className="flex items-center justify-end gap-2">
           <span className="text-sm text-gray-600">Page {page}</span>
-          <button className="rounded border px-2 py-1 text-sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>Prev</button>
-          <button className="rounded border px-2 py-1 text-sm" onClick={() => setPage((p) => p + 1)} disabled={books.length < 25}>Next</button>
+          <Button variant="secondary" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>Prev</Button>
+          <Button variant="secondary" size="sm" onClick={() => setPage((p) => p + 1)} disabled={books.length < 25}>Next</Button>
         </div>
       )}
     </div>

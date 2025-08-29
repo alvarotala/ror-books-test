@@ -190,14 +190,7 @@ export default function MemberBorrowingsPage() {
         <div className="flex items-center justify-end gap-2">
           <span className="text-sm text-gray-600">Page {page}</span>
           <Button variant="secondary" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>Prev</Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((p) => p + 1)}
-            disabled={items.length < 25}
-          >
-            Next
-          </Button>
+          <Button variant="secondary" size="sm" onClick={() => setPage((p) => p + 1)} disabled={items.length < 25}>Next</Button>
         </div>
       )}
     </div>
