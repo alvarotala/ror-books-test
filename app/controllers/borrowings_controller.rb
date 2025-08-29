@@ -5,7 +5,11 @@ class BorrowingsController < ApplicationController
   def index
     scope = current_user.librarian? ? Borrowing.all : current_user.borrowings
     scope = scope.includes(:book, :user).order(created_at: :desc)
-    render json: scope.as_json(include: { book: {}, user: { only: [:id, :email, :first_name, :last_name] } })
+    page = params[:page].to_i
+    page = 1 if page <= 0
+    per_page = 25
+    items = scope.limit(per_page).offset((page - 1) * per_page)
+    render json: items.as_json(include: { book: {}, user: { only: [:id, :email, :first_name, :last_name] } })
   end
 
   def create
