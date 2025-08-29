@@ -21,7 +21,7 @@ RSpec.describe "Dashboards API", type: :request do
     sign_in_as(librarian)
     get "/dashboard/librarian", headers: { 'ACCEPT' => 'application/json' }
     expect(response).to have_http_status(:ok)
-    expect(json).to include('total_books', 'currently_borrowed', 'due_today', 'members_with_overdue')
+    expect(json).to include('total_books', 'currently_borrowed', 'due_today', 'overdue_books_count')
   end
 end
 
