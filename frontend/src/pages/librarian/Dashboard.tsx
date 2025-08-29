@@ -56,24 +56,30 @@ export default function Dashboard() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Total books" value={data?.total_books} />
-            <Stat 
-              label="Currently borrowed" 
-              value={data?.currently_borrowed} 
-              onClick={() => navigate('/borrowings?status=borrowed')}
-              clickable
-            />
-            <Stat 
-              label="Due today" 
-              value={data?.due_today} 
-              onClick={() => navigate('/borrowings?status=borrowed')}
-              clickable
-            />
-            <Stat 
-              label="Members with overdue" 
-              value={data?.members_with_overdue} 
-              onClick={() => navigate('/borrowings?status=overdue')}
-              clickable
-            />
+            {data && data.currently_borrowed > 0 && (
+              <Stat 
+                label="Currently borrowed" 
+                value={data.currently_borrowed} 
+                onClick={() => navigate('/borrowings?status=borrowed')}
+                clickable
+              />
+            )}
+            {data && data.due_today > 0 && (
+              <Stat 
+                label="Due today" 
+                value={data.due_today} 
+                onClick={() => navigate('/borrowings?status=borrowed')}
+                clickable
+              />
+            )}
+            {data && data.members_with_overdue > 0 && (
+              <Stat 
+                label="Members with overdue" 
+                value={data.members_with_overdue} 
+                onClick={() => navigate('/borrowings?status=overdue')}
+                clickable
+              />
+            )}
           </div>
 
           <Card>
