@@ -22,7 +22,7 @@ default: &default
 
 development:
   <<: *default
-  url: <%= ENV["DATABASE_URL_DEV"] %>
+  url: <%= ENV["DATABASE_URL"] %>
   database: ror_books_dev
 
   # The specified database role being used to connect to PostgreSQL.

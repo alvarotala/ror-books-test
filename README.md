@@ -48,6 +48,11 @@ docker compose exec web bash -lc "bin/rails console"
 docker compose exec web bash -lc "bundle exec rspec"
 ```
 
+### Prepare test DB (RSpec)
+```bash
+docker compose exec web bash -lc "unset DATABASE_URL; RAILS_ENV=test bin/rails db:environment:set RAILS_ENV=test && RAILS_ENV=test bin/rails db:prepare"
+```
+
 ### Check logs
 Stream the web container logs (includes Rails server output):
 ```bash
