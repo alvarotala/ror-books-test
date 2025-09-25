@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :borrowings, dependent: :destroy
+  has_many :books, through: :borrowings
 
   enum :role, { librarian: 0, member: 1 }
 
